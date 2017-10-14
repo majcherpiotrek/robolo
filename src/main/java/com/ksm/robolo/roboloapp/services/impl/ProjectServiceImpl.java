@@ -1,7 +1,6 @@
 package com.ksm.robolo.roboloapp.services.impl;
 
 import com.ksm.robolo.roboloapp.domain.ProjectEntity;
-import com.ksm.robolo.roboloapp.enums.TaskStatus;
 import com.ksm.robolo.roboloapp.repository.ProjectRepository;
 import com.ksm.robolo.roboloapp.repository.TaskRepository;
 import com.ksm.robolo.roboloapp.services.EstimationService;
@@ -16,7 +15,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.util.Assert;
 
-import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
 
