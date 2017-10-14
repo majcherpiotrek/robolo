@@ -19,8 +19,8 @@
 	</parent>
 
 	<properties>
-		<projectTO.build.sourceEncoding>UTF-8</projectTO.build.sourceEncoding>
-		<projectTO.reporting.outputEncoding>UTF-8</projectTO.reporting.outputEncoding>
+		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+		<project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
 		<java.version>1.8</java.version>
 	</properties>
 

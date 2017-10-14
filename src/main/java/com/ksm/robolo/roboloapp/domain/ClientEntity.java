@@ -6,7 +6,6 @@ import java.util.Set;
 import javax.persistence.*;
 import javax.validation.constraints.NotNull;
 
-
 @Entity
 @Table(name = "Clients")
 public class ClientEntity {
