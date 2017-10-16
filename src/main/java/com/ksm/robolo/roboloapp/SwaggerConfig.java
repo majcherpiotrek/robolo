@@ -15,7 +15,7 @@ public class SwaggerConfig {
     public Docket api() {
         return new Docket(DocumentationType.SWAGGER_2)
                 .select()
-                .apis(RequestHandlerSelectors.basePackage("com.ksm.robolo.roboloapp.web"))
+                .apis(RequestHandlerSelectors.basePackage("com.ksm.robolo.roboloapp.rest"))
                 .paths(PathSelectors.any())
                 .build();
     }

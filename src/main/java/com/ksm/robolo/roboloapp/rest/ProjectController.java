@@ -1,4 +1,4 @@
-package com.ksm.robolo.roboloapp.web;
+package com.ksm.robolo.roboloapp.rest;
 
 import com.ksm.robolo.roboloapp.tos.ProjectStubTO;
 import com.ksm.robolo.roboloapp.tos.ProjectTO;
