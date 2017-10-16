@@ -5,6 +5,7 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.Table;
+import javax.validation.constraints.NotNull;
 
 @Entity
 @Table(name = "Projects_addresses")
@@ -13,17 +14,23 @@ public class AddressEntity {
 	@Id
 	@GeneratedValue(strategy = GenerationType.AUTO)
 	private Long id;
-	
+
+	@NotNull
 	private String street;
-	
+
+	@NotNull
 	private String houseNumber;
-	
+
+	@NotNull
 	private String apartmentNumber;
-	
+
+	@NotNull
 	private String city;
-	
+
+	@NotNull
 	private String postCode;
-	
+
+	@NotNull
 	private String country;
 
 	public Long getId() {
@@ -80,5 +87,31 @@ public class AddressEntity {
 
 	public void setCountry(String country) {
 		this.country = country;
+	}
+
+	@Override
+	public boolean equals(Object o) {
+		if (this == o) return true;
+		if (!(o instanceof AddressEntity)) return false;
+
+		AddressEntity that = (AddressEntity) o;
+
+		if (!getStreet().equals(that.getStreet())) return false;
+		if (!getHouseNumber().equals(that.getHouseNumber())) return false;
+		if (!getApartmentNumber().equals(that.getApartmentNumber())) return false;
+		if (!getCity().equals(that.getCity())) return false;
+		if (!getPostCode().equals(that.getPostCode())) return false;
+		return getCountry().equals(that.getCountry());
+	}
+
+	@Override
+	public int hashCode() {
+		int result = getStreet().hashCode();
+		result = 31 * result + getHouseNumber().hashCode();
+		result = 31 * result + getApartmentNumber().hashCode();
+		result = 31 * result + getCity().hashCode();
+		result = 31 * result + getPostCode().hashCode();
+		result = 31 * result + getCountry().hashCode();
+		return result;
 	}
 }
