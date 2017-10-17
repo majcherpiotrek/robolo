@@ -4,16 +4,19 @@ import com.ksm.robolo.roboloapp.domain.UserEntity;
 import com.ksm.robolo.roboloapp.repository.UserRepository;
 import com.ksm.robolo.roboloapp.services.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
 @Service
 public class UserServiceImpl implements UserService {
 
     private final UserRepository userRepository;
+    private BCryptPasswordEncoder bCryptPasswordEncoder;
 
     @Autowired
-    public UserServiceImpl(UserRepository userRepository) {
+    public UserServiceImpl(UserRepository userRepository, BCryptPasswordEncoder bCryptPasswordEncoder) {
         this.userRepository = userRepository;
+        this.bCryptPasswordEncoder = bCryptPasswordEncoder;
     }
 
     @Override
@@ -33,6 +36,7 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public void saveUser(UserEntity userEntity) {
+        userEntity.setPassword(bCryptPasswordEncoder.encode(userEntity.getPassword()));
         userRepository.save(userEntity);
     }
 }
