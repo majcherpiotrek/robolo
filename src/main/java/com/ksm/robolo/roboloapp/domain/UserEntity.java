@@ -1,10 +1,10 @@
 package com.ksm.robolo.roboloapp.domain;
 
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
-import javax.persistence.Table;
+import org.hibernate.validator.constraints.Email;
+import org.hibernate.validator.constraints.NotEmpty;
+
+import javax.persistence.*;
+import javax.validation.constraints.NotNull;
 
 @Entity
 @Table(name = "Users")
@@ -13,16 +13,27 @@ public class UserEntity {
 	@Id
 	@GeneratedValue(strategy = GenerationType.AUTO)
 	private Long id;
-	
+
+	@NotEmpty(message = "Please provide your username")
 	private String username;
-	
+
+	@NotEmpty(message = "Please provide your first name")
 	private String name;
-	
+
+	@NotEmpty(message = "Please provide your surname")
 	private String surname;
-	
+
+	@Email(message = "Please provide a valid email")
+	@NotEmpty(message = "Please provide an email")
+	@NotNull
 	private String email;
-	
+
+	@Transient
 	private String password;
+
+	private boolean enabled;
+
+	private String confirmationToken;
 
 	public Long getId() {
 		return id;
@@ -70,5 +81,21 @@ public class UserEntity {
 
 	public void setPassword(String password) {
 		this.password = password;
+	}
+
+	public boolean isEnabled() {
+		return enabled;
+	}
+
+	public void setEnabled(boolean enabled) {
+		this.enabled = enabled;
+	}
+
+	public String getConfirmationToken() {
+		return confirmationToken;
+	}
+
+	public void setConfirmationToken(String confirmationToken) {
+		this.confirmationToken = confirmationToken;
 	}
 }
