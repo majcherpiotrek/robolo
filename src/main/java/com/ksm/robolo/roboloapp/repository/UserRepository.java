@@ -6,4 +6,5 @@ import com.ksm.robolo.roboloapp.domain.UserEntity;
 
 public interface UserRepository extends CrudRepository<UserEntity, Long> {
 
+    UserEntity findByUsername(String username);
 }
