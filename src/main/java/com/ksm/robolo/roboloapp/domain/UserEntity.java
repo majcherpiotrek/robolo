@@ -28,12 +28,7 @@ public class UserEntity {
 	@NotNull
 	private String email;
 
-	@Transient
 	private String password;
-
-	private boolean enabled;
-
-	private String confirmationToken;
 
 	public Long getId() {
 		return id;
@@ -81,21 +76,5 @@ public class UserEntity {
 
 	public void setPassword(String password) {
 		this.password = password;
-	}
-
-	public boolean isEnabled() {
-		return enabled;
-	}
-
-	public void setEnabled(boolean enabled) {
-		this.enabled = enabled;
-	}
-
-	public String getConfirmationToken() {
-		return confirmationToken;
-	}
-
-	public void setConfirmationToken(String confirmationToken) {
-		this.confirmationToken = confirmationToken;
 	}
 }

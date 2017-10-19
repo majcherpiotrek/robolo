@@ -8,7 +8,5 @@ public interface UserService {
 
     UserEntity findByUsername(String username);
 
-    UserEntity findByConfirmationToken(String confirmationToken);
-
     void saveUser(UserEntity userEntity);
 }

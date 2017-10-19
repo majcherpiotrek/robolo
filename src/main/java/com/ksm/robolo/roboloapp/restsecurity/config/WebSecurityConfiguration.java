@@ -1,7 +1,7 @@
-package com.ksm.robolo.roboloapp;
+package com.ksm.robolo.roboloapp.restsecurity.config;
 
 import com.ksm.robolo.roboloapp.domain.UserEntity;
-import com.ksm.robolo.roboloapp.repository.UserRepository;
+import com.ksm.robolo.roboloapp.services.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -16,11 +16,11 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 @Configuration
 public class WebSecurityConfiguration extends GlobalAuthenticationConfigurerAdapter {
 
-    private final UserRepository userRepository;
+    private final UserService userService;
 
     @Autowired
-    public WebSecurityConfiguration(UserRepository userRepository) {
-        this.userRepository = userRepository;
+    public WebSecurityConfiguration(UserService userService) {
+        this.userService = userService;
     }
 
     @Override
@@ -36,8 +36,7 @@ public class WebSecurityConfiguration extends GlobalAuthenticationConfigurerAdap
     @Bean
     UserDetailsService userDetailsService() {
         return username -> {
-            UserEntity userAccount = userRepository.findByUsername(username);
-
+            UserEntity userAccount = userService.findByUsername(username);
             if (userAccount != null) {
                 return new User(userAccount.getUsername(), userAccount.getPassword(), true, true, true, true,
                         AuthorityUtils.createAuthorityList("USER"));
