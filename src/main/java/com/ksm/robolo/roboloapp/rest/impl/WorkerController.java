@@ -19,7 +19,8 @@ public class WorkerController extends AbstractController<WorkerEntity> {
         this.workerService = workerService;
         this.service = workerService;
     }
-
+    
+    // TODO use ResponseEntity instead and return HttpStatus as explained in ProjectController
     @GetMapping(path = "/all")
     @CrossOrigin
     public @ResponseBody
