@@ -58,6 +58,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter{
                 .and()
                 .httpBasic()
                 .and()
+                //TODO only for development!!!
                 .csrf().disable();
     }
 
@@ -76,8 +77,10 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter{
                 .and()
                 .ignoring().antMatchers("/register")
                 .and()
-                .ignoring().antMatchers("/register/confirm")
+                //TODO only for development!!!!
+                .ignoring().antMatchers("/h2-console/**")
                 .and()
-                .ignoring().antMatchers("/h2-console/**");
+                //TODO only for development!!!!
+                .ignoring().antMatchers("/swagger-ui.html/**");
     }
 }

@@ -13,7 +13,11 @@ public class WorkerEntity {
 	@Id
 	@GeneratedValue(strategy = GenerationType.AUTO)
 	private Long id;
-  
+
+	@ManyToOne(targetEntity = UserEntity.class)
+    @NotNull
+	private UserEntity userEntity;
+
 	@NotNull
 	private String name;
 
@@ -30,6 +34,14 @@ public class WorkerEntity {
 
 	public void setId(Long id) {
 		this.id = id;
+	}
+
+	public UserEntity getUserEntity() {
+		return userEntity;
+	}
+
+	public void setUserEntity(UserEntity userEntity) {
+		this.userEntity = userEntity;
 	}
 
 	public String getName() {
@@ -63,6 +75,7 @@ public class WorkerEntity {
 
 		WorkerEntity that = (WorkerEntity) o;
 
+        if(!getUserEntity().getId().equals(that.getUserEntity().getId())) return false;
 		if (!getName().equals(that.getName())) return false;
 		if (!getSurname().equals(that.getSurname())) return false;
 		return getTelephoneNumbers().equals(that.getTelephoneNumbers());
@@ -71,6 +84,7 @@ public class WorkerEntity {
 	@Override
 	public int hashCode() {
 		int result = getName().hashCode();
+        result = 31 * result + getUserEntity().hashCode();
 		result = 31 * result + getSurname().hashCode();
 		result = 31 * result + getTelephoneNumbers().hashCode();
 		return result;

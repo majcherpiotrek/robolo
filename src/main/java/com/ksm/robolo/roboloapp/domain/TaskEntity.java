@@ -16,6 +16,10 @@ public class TaskEntity {
 	@GeneratedValue(strategy = GenerationType.AUTO)
 	private Long id;
 
+	@ManyToOne(targetEntity = UserEntity.class)
+    @NotNull
+	private UserEntity userEntity;
+
 	@NotNull
 	private String description;
 
@@ -51,6 +55,14 @@ public class TaskEntity {
 
 	public void setId(Long id) {
 		this.id = id;
+	}
+
+	public UserEntity getUserEntity() {
+		return userEntity;
+	}
+
+	public void setUserEntity(UserEntity userEntity) {
+		this.userEntity = userEntity;
 	}
 
 	public String getDescription() {
@@ -124,6 +136,7 @@ public class TaskEntity {
 
 		TaskEntity that = (TaskEntity) o;
 
+        if(!getUserEntity().equals(that.getUserEntity())) return false;
 		if (!getDescription().equals(that.getDescription())) return false;
 		if (getEstimatedTaskDuration() != null ? !getEstimatedTaskDuration().equals(that.getEstimatedTaskDuration()) : that.getEstimatedTaskDuration() != null)
 			return false;
@@ -138,6 +151,7 @@ public class TaskEntity {
 	@Override
 	public int hashCode() {
 		int result = getDescription().hashCode();
+        result = 31 * result + getUserEntity().hashCode();
 		result = 31 * result + (getEstimatedTaskDuration() != null ? getEstimatedTaskDuration().hashCode() : 0);
 		result = 31 * result + getProject().hashCode();
 		result = 31 * result + getWorkers().hashCode();

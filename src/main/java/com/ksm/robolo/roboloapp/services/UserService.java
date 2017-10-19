@@ -9,4 +9,6 @@ public interface UserService {
     UserEntity findByUsername(String username);
 
     void saveUser(UserEntity userEntity);
+
+    UserEntity getLoggedInUser();
 }
