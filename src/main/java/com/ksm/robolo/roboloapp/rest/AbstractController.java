@@ -9,6 +9,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
+//TODO let's not use it at all, just the Abstrac
 @RestController
 public abstract class AbstractController<T> implements Controller<T> {
     protected AbstractService<T> service;
