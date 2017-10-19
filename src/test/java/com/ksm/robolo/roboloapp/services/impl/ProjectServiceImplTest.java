@@ -104,6 +104,12 @@ public class ProjectServiceImplTest {
     @Test
     public void getAllProjectStubsFromClient() throws Exception {
 
+
+
+
+
+
+
     }
 
     @Test
