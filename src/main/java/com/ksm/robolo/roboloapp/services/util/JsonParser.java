@@ -6,6 +6,7 @@ import com.google.gson.GsonBuilder;
 import org.springframework.stereotype.Component;
 
 import java.lang.reflect.Type;
+//TODO we don't need it for now, remove it
 @Component
 public class JsonParser {
 
