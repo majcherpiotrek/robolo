@@ -12,6 +12,8 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 public abstract class AbstractController<T> implements Controller<T> {
     protected AbstractService<T> service;
+    //TODO we don't need json parser, we will use ResponseEntity<> - it translates objects to json automatically
+    // Remove it from the class
     protected JsonParser jsonParser;
 
 
