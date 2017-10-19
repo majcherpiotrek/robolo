@@ -2,6 +2,7 @@ package com.ksm.robolo.roboloapp.repository;
 
 import java.util.List;
 
+//TODO unused import
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.CrudRepository;
 
