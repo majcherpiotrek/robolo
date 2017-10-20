@@ -5,6 +5,8 @@ import com.ksm.robolo.roboloapp.tos.ProjectTO;
 import com.ksm.robolo.roboloapp.services.ProjectService;
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -23,8 +25,9 @@ public class ProjectController {
 
     @GetMapping(path="/all")
     @CrossOrigin
-    public @ResponseBody Iterable<ProjectTO> getAllProjects() {
-        return projectService.getAllProjects();
+    public ResponseEntity<Iterable<ProjectTO>> getAllProjects() {
+        Iterable<ProjectTO> projectTOS = projectService.getAllProjects();
+        return projectTOS == null ? new ResponseEntity<>(HttpStatus.NOT_FOUND) : new ResponseEntity<>(projectTOS, HttpStatus.OK);
     }
 
     @GetMapping(path="/stubs/all")
