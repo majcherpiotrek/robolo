@@ -1,6 +1,8 @@
 package com.ksm.robolo.roboloapp.services;
 
 import com.ksm.robolo.roboloapp.domain.UserEntity;
+import com.ksm.robolo.roboloapp.services.exceptions.RegistrationException;
+import com.ksm.robolo.roboloapp.tos.UserTO;
 
 public interface UserService {
 
@@ -8,7 +10,7 @@ public interface UserService {
 
     UserEntity findByUsername(String username);
 
-    void saveUser(UserEntity userEntity);
+    void registerUser(UserTO userTO) throws RegistrationException;
 
     UserEntity getLoggedInUser();
 }
