@@ -6,6 +6,7 @@ import com.ksm.robolo.roboloapp.repository.TaskRepository;
 import com.ksm.robolo.roboloapp.services.EstimationService;
 import com.ksm.robolo.roboloapp.tos.ProjectTO;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
@@ -42,12 +43,6 @@ public class ProjectServiceImplTest {
     @Before
     public void injectMocks() {
         MockitoAnnotations.initMocks(this);
-    }
-
-    @Test(expected = IllegalArgumentException.class)
-    public void getAllProjectsNoProjectsInRepository() throws Exception {
-        Mockito.when(projectRepository.findAll()).thenReturn(null);
-        projectService.getAllProjects();
     }
 
     @Test
@@ -101,13 +96,9 @@ public class ProjectServiceImplTest {
         assertTrue(projectTOList.size() == 0);
     }
 
+    @Ignore
     @Test
     public void getAllProjectStubsFromClient() throws Exception {
-
-    }
-
-    @Test
-    public void getProject() throws Exception {
-
+        // TODO create that test
     }
 }
