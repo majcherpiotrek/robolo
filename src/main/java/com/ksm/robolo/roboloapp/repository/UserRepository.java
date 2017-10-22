@@ -20,4 +20,9 @@ public interface UserRepository extends CrudRepository<UserEntity, UUID> {
     @Transactional
     @Query("UPDATE UserEntity u SET u.enabled = true WHERE u.id = :id")
     void setUserEnabled(@Param("id") UUID id);
+
+    @Modifying
+    @Transactional
+    @Query("UPDATE UserEntity u SET u.password = :password WHERE u.id = :id")
+    void setNewPassword(@Param("password") String password, @Param("id") UUID id);
 }

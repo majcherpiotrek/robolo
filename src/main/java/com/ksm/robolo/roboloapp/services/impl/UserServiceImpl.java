@@ -4,14 +4,14 @@ import com.ksm.robolo.roboloapp.domain.UserEntity;
 import com.ksm.robolo.roboloapp.domain.VerificationToken;
 import com.ksm.robolo.roboloapp.repository.UserRepository;
 import com.ksm.robolo.roboloapp.repository.VerificationTokenRepository;
+import com.ksm.robolo.roboloapp.services.EmailService;
 import com.ksm.robolo.roboloapp.services.UserService;
-import com.ksm.robolo.roboloapp.services.exceptions.PasswordsNotMatchingException;
-import com.ksm.robolo.roboloapp.services.exceptions.RegistrationException;
-import com.ksm.robolo.roboloapp.services.exceptions.UserEmailConstraintViolationException;
-import com.ksm.robolo.roboloapp.services.exceptions.UsernameConstraintViolationException;
+import com.ksm.robolo.roboloapp.services.exceptions.*;
+import com.ksm.robolo.roboloapp.tos.RetrievePasswordTO;
 import com.ksm.robolo.roboloapp.tos.UserTO;
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.mail.SimpleMailMessage;
 import org.springframework.security.authentication.AnonymousAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -42,11 +42,14 @@ public class UserServiceImpl implements UserService {
 
     private final VerificationTokenRepository verificationTokenRepository;
 
+    private final EmailService emailService;
+
     @Autowired
-    public UserServiceImpl(UserRepository userRepository, PasswordEncoder passwordEncoder, VerificationTokenRepository verificationTokenRepository) {
+    public UserServiceImpl(UserRepository userRepository, PasswordEncoder passwordEncoder, VerificationTokenRepository verificationTokenRepository, EmailService emailService) {
         this.userRepository = userRepository;
         this.passwordEncoder = passwordEncoder;
         this.verificationTokenRepository = verificationTokenRepository;
+        this.emailService = emailService;
     }
 
     @Override
@@ -148,6 +151,71 @@ public class UserServiceImpl implements UserService {
         logger.info("User \'" + userEntity.getUsername() + "\' has been verified!");
     }
 
+    @Override
+    public void retrievePasswordByUsername(String username) throws RetrievePasswordException {
+
+        UserEntity user = userRepository.findByUsername(username);
+
+        retrievePassword(user);
+    }
+
+    private void retrievePassword(UserEntity user) throws RetrievePasswordException {
+        if (user == null) {
+            throw new RetrievePasswordException("User with username \'" + user.getUsername() + "\' does not exist!");
+        }
+
+        VerificationToken token = verificationTokenRepository.findByUser(user);
+        if (token != null) {
+            verificationTokenRepository.delete(token);
+        }
+
+        token = new VerificationToken();
+        token.setToken(UUID.randomUUID().toString());
+        token.setUser(user);
+        verificationTokenRepository.save(token);
+
+        sendRetrieveTokenEmail(token.getToken(), user);
+    }
+
+    @Override
+    public void retrievePasswordByEmail(String email) throws RetrievePasswordException {
+        UserEntity user = userRepository.findByEmail(email);
+
+        retrievePassword(user);
+    }
+
+    @Override
+    public void changeRetrievedPassword(RetrievePasswordTO retrievePasswordTO) throws RetrievePasswordException {
+        validateRetrievedPassword(retrievePasswordTO);
+
+        VerificationToken verificationToken = verificationTokenRepository.findByToken(retrievePasswordTO.getToken());
+
+        if (verificationToken == null) {
+            throw new RetrievePasswordException("We are sorry, your token is invalid or expired.");
+        }
+
+        if (verificationToken.getUser() == null) {
+            throw new RetrievePasswordException("We are sorry, there is no user connected to this token!");
+        }
+
+        try {
+            UserEntity userEntity = userRepository.findOne(verificationToken.getUser().getId());
+
+            if (userEntity == null) {
+                throw new RetrievePasswordException("We are sorry, there is no user connected to this token!");
+            }
+
+            userRepository.setNewPassword(passwordEncoder.encode(retrievePasswordTO.getPassword()), userEntity.getId());
+        } catch (Exception e) {
+            throw new RetrievePasswordException(e.getMessage());
+        }
+    }
+
+    private void validateRetrievedPassword(RetrievePasswordTO retrievePasswordTO) {
+        Assert.notNull(retrievePasswordTO, "Please provide new password!");
+        Assert.isTrue(retrievePasswordTO.getPassword().equals(retrievePasswordTO.getMatchingPassword()), "The passwords don't match!");
+    }
+
     private UserEntity findByVerificationToken(String verificationToken) {
         return verificationTokenRepository.findByToken(verificationToken).getUser();
     }
@@ -179,5 +247,15 @@ public class UserServiceImpl implements UserService {
         logger.info("Saved new user: " + userEntity.getUsername());
     }
 
+    private void sendRetrieveTokenEmail(String token, UserEntity user) {
+        String recipientAddress = user.getEmail();
+        String subject = "Robolify - retrieve password";
 
+        SimpleMailMessage email = new SimpleMailMessage();
+        email.setFrom("robolify@gmail.com");
+        email.setTo(recipientAddress);
+        email.setSubject(subject);
+        email.setText("Copy this token to change your password: " + token);
+        emailService.sendMail(email);
+    }
 }

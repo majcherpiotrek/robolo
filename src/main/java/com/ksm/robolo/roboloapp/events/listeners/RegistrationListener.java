@@ -1,11 +1,11 @@
 package com.ksm.robolo.roboloapp.events.listeners;
 
 import com.ksm.robolo.roboloapp.events.OnRegistrationCompleteEvent;
+import com.ksm.robolo.roboloapp.services.EmailService;
 import com.ksm.robolo.roboloapp.services.UserService;
 import com.ksm.robolo.roboloapp.tos.UserTO;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationListener;
-import org.springframework.context.MessageSource;
 import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.stereotype.Component;
@@ -17,12 +17,12 @@ public class RegistrationListener implements ApplicationListener<OnRegistrationC
 
     private final UserService userService;
 
-    private final JavaMailSender mailSender;
+    private final EmailService emailService;
 
     @Autowired
-    public RegistrationListener(UserService userService, JavaMailSender mailSender) {
+    public RegistrationListener(UserService userService, EmailService emailService) {
         this.userService = userService;
-        this.mailSender = mailSender;
+        this.emailService = emailService;
     }
 
     @Override
@@ -43,6 +43,6 @@ public class RegistrationListener implements ApplicationListener<OnRegistrationC
         email.setTo(recipientAddress);
         email.setSubject(subject);
         email.setText("Click this link to confirm your account: " + event.getAppUrl() + token);
-        mailSender.send(email);
+        emailService.sendMail(email);
     }
 }
