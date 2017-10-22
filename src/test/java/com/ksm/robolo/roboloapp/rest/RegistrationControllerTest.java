@@ -1,12 +1,12 @@
 package com.ksm.robolo.roboloapp.rest;
 
-import com.google.gson.*;
-import com.ksm.robolo.roboloapp.services.UserService;
+import com.fasterxml.jackson.databind.SerializationFeature;
+import com.ksm.robolo.roboloapp.RoboloAppApplication;
+import com.ksm.robolo.roboloapp.repository.UserRepository;
 import com.ksm.robolo.roboloapp.services.exceptions.RegistrationException;
 import com.ksm.robolo.roboloapp.tos.UserTO;
-import com.sun.javafx.collections.MappingChange;
+import org.apache.log4j.Logger;
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -14,35 +14,17 @@ import org.springframework.boot.context.embedded.LocalServerPort;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.web.client.TestRestTemplate;
 import org.springframework.http.*;
+import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
 import org.springframework.test.context.junit4.SpringRunner;
-import org.springframework.util.LinkedMultiValueMap;
-import org.springframework.util.MultiValueMap;
 
-import java.lang.reflect.Type;
-import java.util.LinkedHashMap;
-import java.util.Map;
-
-
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
 
 @RunWith(SpringRunner.class)
-@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
+@SpringBootTest(classes = RoboloAppApplication.class, webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 public class RegistrationControllerTest {
 
-    public static class UserSerializer implements JsonSerializer<UserTO> {
-        public JsonElement serialize(final UserTO userTO, final Type type, final JsonSerializationContext context) {
-            JsonObject result = new JsonObject();
-            result.add("name", new JsonPrimitive(userTO.getName()));
-            result.add("surname", new JsonPrimitive(userTO.getSurname()));
-            result.add("username", new JsonPrimitive(userTO.getUsername()));
-            result.add("password", new JsonPrimitive(userTO.getPassword()));
-            result.add("matchingPassword", new JsonPrimitive(userTO.getMatchingPassword()));
-            result.add("email", new JsonPrimitive(userTO.getEmail()));
-            return result;
-        }
-    }
+    private static final Logger logger = Logger.getLogger(RegistrationControllerTest.class);
 
-    private final static String REGISTRATION_SUCCESS_MSG = "REGISTRATION SUCCESSFUL";
     private static final String LOCALHOST = "http://localhost:";
 
     private UserTO userTO;
@@ -59,10 +41,10 @@ public class RegistrationControllerTest {
     private TestRestTemplate restTemplate;
 
     @Autowired
-    private UserService userService;
+    private UserRepository userRepository;
 
     @Before
-    public void initUserTO() throws RegistrationException {
+    public void init() throws RegistrationException {
         userTO = new UserTO();
         userTO.setName(name);
         userTO.setSurname(surname);
@@ -70,23 +52,115 @@ public class RegistrationControllerTest {
         userTO.setPassword(password);
         userTO.setMatchingPassword(password);
         userTO.setEmail(email);
-        userService.registerUser(userTO);
+
+        MappingJackson2HttpMessageConverter jsonHttpMessageConverter = new MappingJackson2HttpMessageConverter();
+        jsonHttpMessageConverter.getObjectMapper().configure(SerializationFeature.FAIL_ON_EMPTY_BEANS, false);
+        restTemplate.getRestTemplate().getMessageConverters().add(jsonHttpMessageConverter);
+
+        userRepository.deleteAll();
     }
 
-    @Ignore
     @Test
-    public void registerValidUserShouldReturnSuccessMessageAndHttpStatusCREATED() throws InterruptedException {
-        //TODO WTF the request gets send twice, so the test goes well first time (the user is saved), and then fails. See the logs
-        HttpHeaders headers = new HttpHeaders();
-        headers.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
+    public void registerValidUserShouldReturnSuccessMessageAndHttpStatusCREATED() {
+        HttpHeaders  headers = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_JSON);
 
-        MultiValueMap<String, String> map= new LinkedMultiValueMap<>();
+        HttpEntity<UserTO> httpEntity = new HttpEntity<>(userTO, headers);
 
-        Gson gson = new GsonBuilder().registerTypeAdapter(UserTO.class, new UserSerializer()).create();
-        map.add("userTO", gson.toJson(userTO));
+        String url = LOCALHOST + port + "/register";
+        logger.info("Sending request to: " + url);
+        logger.info("HttpEntity being sent: " + httpEntity.getBody());
+        ResponseEntity<String> responseEntity = restTemplate
+                .exchange(url, HttpMethod.POST, httpEntity, String.class);
 
-        HttpEntity<MultiValueMap<String, String>> request = new HttpEntity<>(map, headers);
 
-        assertTrue(HttpStatus.CREATED.equals(restTemplate.postForEntity(LOCALHOST + port + "/register", request, String.class).getStatusCode()));
+        assertEquals(HttpStatus.CREATED, responseEntity.getStatusCode());
+        logger.info("Response: " + responseEntity.getBody());
+    }
+
+    @Test
+    public void registerUserWithSameEmailShouldReturnHttpStatusCONFLICT() {
+        HttpHeaders  headers = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_JSON);
+
+        HttpEntity<UserTO> httpEntity = new HttpEntity<>(userTO, headers);
+
+        String url = LOCALHOST + port + "/register";
+        logger.info("Sending request to: " + url);
+        logger.info("HttpEntity being sent: " + httpEntity.getBody());
+        restTemplate
+                .exchange(url, HttpMethod.POST, httpEntity, String.class);
+
+        userTO.setUsername(username + 2);
+        httpEntity = new HttpEntity<>(userTO, headers);
+
+        logger.info("Sending request to: " + url);
+        logger.info("HttpEntity being sent: " + httpEntity.getBody());
+        ResponseEntity<String> responseEntity = restTemplate
+                .exchange(url, HttpMethod.POST, httpEntity, String.class);
+
+        assertEquals(HttpStatus.CONFLICT, responseEntity.getStatusCode());
+        logger.info("Response: " + responseEntity.getBody());
+    }
+
+    @Test
+    public void registerUserWithSameUsernameShouldReturnHttpStatusCONFLICT() {
+        HttpHeaders  headers = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_JSON);
+
+        HttpEntity<UserTO> httpEntity = new HttpEntity<>(userTO, headers);
+
+        String url = LOCALHOST + port + "/register";
+        logger.info("Sending request to: " + url);
+        logger.info("HttpEntity being sent: " + httpEntity.getBody());
+        restTemplate
+                .exchange(url, HttpMethod.POST, httpEntity, String.class);
+
+        userTO.setEmail("bla@bla.com");
+        httpEntity = new HttpEntity<>(userTO, headers);
+
+        logger.info("Sending request to: " + url);
+        logger.info("HttpEntity being sent: " + httpEntity.getBody());
+        ResponseEntity<String> responseEntity = restTemplate
+                .exchange(url, HttpMethod.POST, httpEntity, String.class);
+
+        assertEquals(HttpStatus.CONFLICT, responseEntity.getStatusCode());
+        logger.info("Response: " + responseEntity.getBody());
+    }
+
+    @Test
+    public void registerEmptyUserShouldReturnHttpStatusConflict() {
+        HttpHeaders  headers = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_JSON);
+
+        HttpEntity<UserTO> httpEntity = new HttpEntity<>(new UserTO(), headers);
+
+        String url = LOCALHOST + port + "/register";
+        logger.info("Sending request to: " + url);
+        logger.info("HttpEntity being sent: " + httpEntity.getBody());
+        ResponseEntity<String> responseEntity = restTemplate
+                .exchange(url, HttpMethod.POST, httpEntity, String.class);
+
+
+        assertEquals(HttpStatus.CONFLICT, responseEntity.getStatusCode());
+        logger.info("Response: " + responseEntity.getBody());
+    }
+
+    @Test
+    public void registerUserWithInvalidEmailAddressShouldReturnHttpStatusCONFLICT() {
+        HttpHeaders  headers = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_JSON);
+
+        userTO.setEmail("mail");
+        HttpEntity<UserTO> httpEntity = new HttpEntity<>(userTO, headers);
+
+        String url = LOCALHOST + port + "/register";
+        logger.info("Sending request to: " + url);
+        logger.info("HttpEntity being sent: " + httpEntity.getBody());
+        ResponseEntity<String> responseEntity = restTemplate
+                .exchange(url, HttpMethod.POST, httpEntity, String.class);
+
+        assertEquals(HttpStatus.CONFLICT, responseEntity.getStatusCode());
+        logger.info("Response: " + responseEntity.getBody());
     }
 }

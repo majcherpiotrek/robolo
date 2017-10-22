@@ -112,13 +112,6 @@ public class UserServiceImpl implements UserService {
     }
 
     private void validateUserRegistrationData(UserTO userTO) throws UserEmailConstraintViolationException, UsernameConstraintViolationException, PasswordsNotMatchingException {
-
-        logger.info("TO: " + userTO.getUsername());
-        logger.info("TO: " + userTO.getPassword());
-        logger.info("TO: " + userTO.getEmail());
-        logger.info("TO: " + userTO.getName());
-        logger.info("TO: " + userTO.getSurname());
-
         Assert.notNull(userTO.getPassword(), "Please provide a password");
         Assert.isTrue(userTO.getPassword().length() >= 8, "The password must be at least 8 characters" );
         UserEntity userEntity = findByEmail(userTO.getEmail());
