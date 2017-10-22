@@ -77,6 +77,8 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter{
                 .and()
                 .ignoring().antMatchers("/register")
                 .and()
+                .ignoring().antMatchers("/confirm/**")
+                .and()
                 //TODO only for development!!!!
                 .ignoring().antMatchers("/h2-console/**")
                 .and()

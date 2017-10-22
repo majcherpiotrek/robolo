@@ -36,6 +36,12 @@ public class UserEntity {
 	@Length(min = 8, message = "The password must be at least 8 characters")
 	private String password;
 
+    private boolean enabled;
+
+    public UserEntity() {
+    	super();
+    	this.enabled = false;
+	}
 	public UUID getId() {
 		return id;
 	}
@@ -84,7 +90,15 @@ public class UserEntity {
 		this.password = password;
 	}
 
-    @Override
+	public boolean isEnabled() {
+		return enabled;
+	}
+
+	public void setEnabled(boolean enabled) {
+		this.enabled = enabled;
+	}
+
+	@Override
     public boolean equals(Object o) {
         if (this == o) return true;
         if (!(o instanceof UserEntity)) return false;

@@ -35,7 +35,7 @@ public class WebSecurityConfiguration extends GlobalAuthenticationConfigurerAdap
         return username -> {
             UserEntity userAccount = userService.findByUsername(username);
             if (userAccount != null) {
-                return new User(userAccount.getUsername(), userAccount.getPassword(), true, true, true, true,
+                return new User(userAccount.getUsername(), userAccount.getPassword(), userAccount.isEnabled(), true, true, true,
                         AuthorityUtils.createAuthorityList("USER"));
             } else {
                 throw new UsernameNotFoundException("Could not find the user \"" + username + "\"");

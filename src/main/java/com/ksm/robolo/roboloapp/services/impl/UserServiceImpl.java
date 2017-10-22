@@ -1,7 +1,9 @@
 package com.ksm.robolo.roboloapp.services.impl;
 
 import com.ksm.robolo.roboloapp.domain.UserEntity;
+import com.ksm.robolo.roboloapp.domain.VerificationToken;
 import com.ksm.robolo.roboloapp.repository.UserRepository;
+import com.ksm.robolo.roboloapp.repository.VerificationTokenRepository;
 import com.ksm.robolo.roboloapp.services.UserService;
 import com.ksm.robolo.roboloapp.services.exceptions.PasswordsNotMatchingException;
 import com.ksm.robolo.roboloapp.services.exceptions.RegistrationException;
@@ -29,18 +31,19 @@ public class UserServiceImpl implements UserService {
 
     private static final String DUPLICATE_USER_EMAIL_ERROR = "User with this email address already exists.";
     private static final String DUPLICATE_USERNAME_ERROR = "User with this username already exists.";
-    private static final String PASSWORDS_NOT_MATCHING_ERROR = "Entered passwords are not matching.";
-    private static final int MIN_USERNAME_LENGTH = 4;
-    private static final int MIN_PASSWORD_LENGTH = 8;
+    private static final String PASSWORDS_NOT_MATCHING_ERROR = "Entered passwords are not matching.";;
 
     private final UserRepository userRepository;
 
     private final PasswordEncoder passwordEncoder;
 
+    private final VerificationTokenRepository verificationTokenRepository;
+
     @Autowired
-    public UserServiceImpl(UserRepository userRepository, PasswordEncoder passwordEncoder) {
+    public UserServiceImpl(UserRepository userRepository, PasswordEncoder passwordEncoder, VerificationTokenRepository verificationTokenRepository) {
         this.userRepository = userRepository;
         this.passwordEncoder = passwordEncoder;
+        this.verificationTokenRepository = verificationTokenRepository;
     }
 
     @Override
@@ -66,12 +69,7 @@ public class UserServiceImpl implements UserService {
             userEntity.setEmail(userTO.getEmail());
 
             saveUser(userEntity);
-
-        } catch (UserEmailConstraintViolationException |
-                UsernameConstraintViolationException |
-                PasswordsNotMatchingException |
-                IllegalArgumentException |
-                TransactionSystemException e) {
+        } catch (Exception e) {
 
             String errorMessage = null;
             if (e instanceof TransactionSystemException) {
@@ -111,6 +109,31 @@ public class UserServiceImpl implements UserService {
         return userEntity;
     }
 
+    @Override
+    public void createVerificationToken(String token, UserTO user) {
+        VerificationToken userToken = new VerificationToken();
+        userToken.setToken(token);
+        UserEntity userEntity = userRepository.findByEmail(user.getEmail());
+        userToken.setUser(userEntity);
+        verificationTokenRepository.save(userToken);
+    }
+
+    @Override
+    public void confirmUser(String verificationToken) throws RegistrationException {
+        UserEntity userEntity = findByVerificationToken(verificationToken);
+
+        if (userEntity == null) {
+            throw new RegistrationException("Could not verify - user does not exist!");
+        }
+
+        userRepository.setUserEnabled(userEntity.getId());
+        logger.info("User \'" + userEntity.getUsername() + "\' has been verified!");
+    }
+
+    private UserEntity findByVerificationToken(String verificationToken) {
+        return verificationTokenRepository.findByToken(verificationToken).getUser();
+    }
+
     private void validateUserRegistrationData(UserTO userTO) throws UserEmailConstraintViolationException, UsernameConstraintViolationException, PasswordsNotMatchingException {
         Assert.notNull(userTO.getPassword(), "Please provide a password");
         Assert.isTrue(userTO.getPassword().length() >= 8, "The password must be at least 8 characters" );
@@ -136,4 +159,6 @@ public class UserServiceImpl implements UserService {
         userRepository.save(userEntity);
         logger.info("Saved new user: " + userEntity.getUsername());
     }
+
+
 }
