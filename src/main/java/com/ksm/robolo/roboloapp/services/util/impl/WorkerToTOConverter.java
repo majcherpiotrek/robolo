@@ -5,9 +5,10 @@ import com.ksm.robolo.roboloapp.services.util.EntityToTOConverter;
 import com.ksm.robolo.roboloapp.tos.WorkerTO;
 import org.springframework.util.Assert;
 
+import java.util.ArrayList;
 import java.util.List;
 
-public class WorkerToTOConverter implements EntityToTOConverter<WorkerTO, WorkerEntity>{
+public class WorkerToTOConverter implements EntityToTOConverter<WorkerTO, WorkerEntity> {
 
     @Override
     public WorkerTO convertToTO(WorkerEntity entity) {
@@ -22,7 +23,16 @@ public class WorkerToTOConverter implements EntityToTOConverter<WorkerTO, Worker
 
     @Override
     public List<WorkerTO> convertListToTOList(List<WorkerEntity> entityList) {
-        // TODO implement
-        return null;
+
+        List<WorkerTO> stubList = new ArrayList<>();
+
+
+        if (entityList != null) {
+            for (WorkerEntity workerEntity : entityList) {
+                stubList.add(this.convertToTO(workerEntity));
+            }
+        }
+
+        return stubList;
     }
 }

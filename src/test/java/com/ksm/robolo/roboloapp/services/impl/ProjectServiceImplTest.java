@@ -103,11 +103,6 @@ public class ProjectServiceImplTest {
 
     @Test
     public void getAllProjectStubsFromClient() throws Exception {
-
-    }
-
-    @Test
-    public void getProject() throws Exception {
-
+        // TODO create that test
     }
 }

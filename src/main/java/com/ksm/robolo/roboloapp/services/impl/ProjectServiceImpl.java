@@ -5,6 +5,7 @@ import com.ksm.robolo.roboloapp.repository.ProjectRepository;
 import com.ksm.robolo.roboloapp.repository.TaskRepository;
 import com.ksm.robolo.roboloapp.services.EstimationService;
 import com.ksm.robolo.roboloapp.services.ProjectService;
+import com.ksm.robolo.roboloapp.services.util.impl.ProjectEntityToStubConverter;
 import com.ksm.robolo.roboloapp.services.util.impl.ProjectEntityToTOConverter;
 import com.ksm.robolo.roboloapp.services.util.impl.TaskToTOConverter;
 import com.ksm.robolo.roboloapp.tos.ProjectStubTO;
@@ -15,14 +16,15 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.util.Assert;
 
+import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 
 @Service
-public class ProjectServiceImpl implements ProjectService{
+public class ProjectServiceImpl implements ProjectService {
 
     private static final Logger logger = Logger.getLogger(ProjectServiceImpl.class);
-    private static final String ERROR_PROJECTS_NOT_FOUND = "No projects found in the database";
+
 
     private ProjectRepository projectRepository;
     private TaskRepository taskRepository;
@@ -43,7 +45,6 @@ public class ProjectServiceImpl implements ProjectService{
     @Override
     public List<ProjectTO> getAllProjects() {
         List<ProjectEntity> projectEntityList = projectRepository.findAll();
-        Assert.notNull(projectEntityList, ERROR_PROJECTS_NOT_FOUND);
         List<ProjectTO> projectTOList = new LinkedList<>();
 
         if (!projectEntityList.isEmpty()) {
@@ -61,19 +62,30 @@ public class ProjectServiceImpl implements ProjectService{
 
     @Override
     public List<ProjectStubTO> getAllProjectsStubs() {
-        // TODO implement
-        return null;
+        List<ProjectEntity> projectEntityList = projectRepository.findAll();
+        List<ProjectStubTO> projectStubs
+                = new ProjectEntityToStubConverter().convertListToTOList(projectEntityList);
+        return projectStubs;
     }
 
     @Override
     public List<ProjectStubTO> getAllProjectStubsFromClient(Long clientId) {
-        // TODO implemnt
-        return null;
+
+        List<ProjectEntity> projectEntityList = projectRepository.findAllByClientId(clientId);
+        List<ProjectStubTO> projectStubsWithClientId = new LinkedList<>();
+        if (projectEntityList != null) {
+            for (ProjectEntity projectEntity : projectEntityList) {
+                    ProjectStubTO stub = new ProjectEntityToStubConverter().convertToTO(projectEntity);
+                    projectStubsWithClientId.add(stub);
+            }
+        }
+        return projectStubsWithClientId;
     }
 
     @Override
     public ProjectTO getProject(Long projectId) {
-        // TODO implement
-        return null;
+        final ProjectEntity projectEntity = projectRepository.findOne(projectId);
+        ProjectTO projectTO = projectEntityToTOConverter.convertToTO(projectEntity);
+        return projectTO;
     }
 }
