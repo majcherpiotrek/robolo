@@ -41,6 +41,7 @@ public class UserEntity {
     public UserEntity() {
     	super();
     	this.enabled = false;
+
 	}
 	public UUID getId() {
 		return id;

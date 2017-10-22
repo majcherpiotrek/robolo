@@ -1,5 +1,6 @@
 package com.ksm.robolo.roboloapp.repository;
 
+import com.ksm.robolo.roboloapp.domain.VerificationToken;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.CrudRepository;

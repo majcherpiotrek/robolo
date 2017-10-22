@@ -51,7 +51,7 @@ public class RegistrationController {
         try {
             userService.confirmUser(verificationToken);
         } catch (RegistrationException e) {
-            return new ResponseEntity<String>(e.getMessage(), HttpStatus.CONFLICT);
+            return new ResponseEntity<>(e.getMessage(), HttpStatus.CONFLICT);
         }
 
         return new ResponseEntity<>("Your account has been activated!", HttpStatus.OK);

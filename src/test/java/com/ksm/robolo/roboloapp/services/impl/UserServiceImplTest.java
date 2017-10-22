@@ -1,6 +1,7 @@
 package com.ksm.robolo.roboloapp.services.impl;
 
 import com.ksm.robolo.roboloapp.repository.UserRepository;
+import com.ksm.robolo.roboloapp.repository.VerificationTokenRepository;
 import com.ksm.robolo.roboloapp.services.UserService;
 import com.ksm.robolo.roboloapp.services.exceptions.RegistrationException;
 import com.ksm.robolo.roboloapp.tos.UserTO;
@@ -31,8 +32,12 @@ public class UserServiceImplTest {
     @Autowired
     private UserRepository userRepository;
 
+    @Autowired
+    private VerificationTokenRepository verificationTokenRepository;
+
     @Before
     public void initRepoWithCorrectData() throws RegistrationException {
+        verificationTokenRepository.deleteAll();
         userRepository.deleteAll();
         userTO = new UserTO();
         userTO.setName(name);

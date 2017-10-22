@@ -3,6 +3,7 @@ package com.ksm.robolo.roboloapp.rest;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.ksm.robolo.roboloapp.RoboloAppApplication;
 import com.ksm.robolo.roboloapp.repository.UserRepository;
+import com.ksm.robolo.roboloapp.repository.VerificationTokenRepository;
 import com.ksm.robolo.roboloapp.services.exceptions.RegistrationException;
 import com.ksm.robolo.roboloapp.tos.UserTO;
 import org.apache.log4j.Logger;
@@ -32,7 +33,7 @@ public class RegistrationControllerTest {
     private static final String surname = "surname";
     private static final String username = "piotrek";
     private static final String password = "password";
-    private static final String email = "e@mail.com";
+    private static final String email = "robolify@gmail.com";
 
     @LocalServerPort
     private int port;
@@ -42,6 +43,9 @@ public class RegistrationControllerTest {
 
     @Autowired
     private UserRepository userRepository;
+
+    @Autowired
+    private VerificationTokenRepository verificationTokenRepository;
 
     @Before
     public void init() throws RegistrationException {
@@ -57,6 +61,7 @@ public class RegistrationControllerTest {
         jsonHttpMessageConverter.getObjectMapper().configure(SerializationFeature.FAIL_ON_EMPTY_BEANS, false);
         restTemplate.getRestTemplate().getMessageConverters().add(jsonHttpMessageConverter);
 
+        verificationTokenRepository.deleteAll();
         userRepository.deleteAll();
     }
 
