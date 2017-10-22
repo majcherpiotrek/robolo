@@ -5,10 +5,11 @@ import com.ksm.robolo.roboloapp.services.util.EntityToTOConverter;
 import com.ksm.robolo.roboloapp.tos.ClientTO;
 import org.springframework.util.Assert;
 
+import java.util.ArrayList;
 import java.util.List;
 
-public class ClientToTOConverter implements EntityToTOConverter<ClientTO, ClientEntity>{
-
+public class ClientToTOConverter implements EntityToTOConverter<ClientTO, ClientEntity> {
+    // this class is porobably relevent
     @Override
     public ClientTO convertToTO(ClientEntity entity) {
         Assert.notNull(entity, NULL_ARGUMENT_ERROR);
@@ -23,7 +24,12 @@ public class ClientToTOConverter implements EntityToTOConverter<ClientTO, Client
 
     @Override
     public List<ClientTO> convertListToTOList(List<ClientEntity> entityList) {
-        // TODO implement
-        return null;
+        List<ClientTO> clientTOList = new ArrayList<>();
+        if (entityList != null) {
+            for (ClientEntity clientEntity : entityList) {
+                clientTOList.add(this.convertToTO(clientEntity));
+            }
+        }
+        return clientTOList;
     }
 }
