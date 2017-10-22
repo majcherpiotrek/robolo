@@ -24,8 +24,7 @@ import java.util.List;
 public class ProjectServiceImpl implements ProjectService {
 
     private static final Logger logger = Logger.getLogger(ProjectServiceImpl.class);
-    // TODO we dont need this string anymore
-    private static final String ERROR_PROJECTS_NOT_FOUND = "No projects found in the database";
+
 
     private ProjectRepository projectRepository;
     private TaskRepository taskRepository;
@@ -46,8 +45,6 @@ public class ProjectServiceImpl implements ProjectService {
     @Override
     public List<ProjectTO> getAllProjects() {
         List<ProjectEntity> projectEntityList = projectRepository.findAll();
-        // TODO we can remove this assertion - we will handle nulls in the controller by returning the HttpStatus.NOT_FOUND
-        Assert.notNull(projectEntityList, ERROR_PROJECTS_NOT_FOUND);
         List<ProjectTO> projectTOList = new LinkedList<>();
 
         if (!projectEntityList.isEmpty()) {
@@ -75,8 +72,7 @@ public class ProjectServiceImpl implements ProjectService {
     public List<ProjectStubTO> getAllProjectStubsFromClient(Long clientId) {
 
         List<ProjectEntity> projectEntityList = projectRepository.findAllByClientId(clientId);
-        // TODO change to LinkedList - better when adding elements in the loop, muuuuch faster
-        List<ProjectStubTO> projectStubsWithClientId = new ArrayList<>();
+        List<ProjectStubTO> projectStubsWithClientId = new LinkedList<>();
         if (projectEntityList != null) {
             for (ProjectEntity projectEntity : projectEntityList) {
                     ProjectStubTO stub = new ProjectEntityToStubConverter().convertToTO(projectEntity);

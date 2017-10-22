@@ -2,7 +2,7 @@ package com.ksm.robolo.roboloapp.services;
 
 import org.springframework.data.repository.CrudRepository;
 
-public abstract class AbstractService<T> implements Service<T> {
+public abstract class AbstractService<T> implements CrudOperations<T> {
     protected CrudRepository<T, Long> repository;
 
     @Override
@@ -20,13 +20,12 @@ public abstract class AbstractService<T> implements Service<T> {
         return repository.save(items);
     }
     
-    // TODO remember to change to UUID when we migrate
+
     @Override
     public T getItemById(long id) {
         return repository.findOne(id);
     }
-    
-    // TODO remember to change to UUID when we migrate
+
     @Override
     public Iterable<T> getItemsByIds(Iterable<Long> ids) {
         return repository.findAll(ids);

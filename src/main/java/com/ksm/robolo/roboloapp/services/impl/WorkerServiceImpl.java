@@ -11,12 +11,8 @@ import org.springframework.stereotype.Service;
 @Service
 public class WorkerServiceImpl extends AbstractService<WorkerEntity> {
 
-    private WorkerRepository workerRepository;
-
-    //TODO we autowire the constructors, not setters - just a convention but let's make everywhere the same
     @Autowired
-    public void setUserRepository(WorkerRepository workerRepository){
-        this.workerRepository = workerRepository;
+    public WorkerServiceImpl(WorkerRepository workerRepository) {
         this.repository = workerRepository;
     }
 
