@@ -84,7 +84,14 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter{
                 //TODO only for development!!!!
                 .ignoring().antMatchers("/h2-console/**")
                 .and()
-                //TODO only for development!!!!
-                .ignoring().antMatchers("/swagger-ui.html/**");
+                .ignoring().antMatchers("/swagger-ui.html/**")
+                .and()
+                .ignoring().antMatchers("/swagger-resources/**")
+                .and()
+                .ignoring().antMatchers("/v2/api-docs/**")
+                .and()
+                .ignoring().antMatchers("/**/favicon.ico")
+                .and()
+                .ignoring().antMatchers("/webjars/**");
     }
 }
