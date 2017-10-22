@@ -17,7 +17,7 @@ import static org.junit.Assert.*;
 
 public class ProjectEntityToStubConverterTest {
     @Test
-    public void ProjectEntityToProjectEntityToTest() throws Exception {
+    public void ProjectEntityToProjectToTest() throws Exception {
         AddressEntity addressEntity = new AddressEntity();
         addressEntity.setApartmentNumber("1");
         addressEntity.setCity("Radom");
