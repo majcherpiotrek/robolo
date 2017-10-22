@@ -1,8 +1,8 @@
-package com.ksm.robolo.roboloapp.rest.impl;
+package com.ksm.robolo.roboloapp.rest;
 
+import com.ksm.robolo.roboloapp.services.ProjectService;
 import com.ksm.robolo.roboloapp.tos.ProjectStubTO;
 import com.ksm.robolo.roboloapp.tos.ProjectTO;
-import com.ksm.robolo.roboloapp.services.ProjectService;
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -69,7 +69,7 @@ public class ProjectController {
         fromClientList = projectService.getAllProjectStubsFromClient(clientIdLong);
 
         return fromClientList == null ?
-                new ResponseEntity<Iterable<ProjectStubTO>>(HttpStatus.NOT_FOUND) :
+                new ResponseEntity<>(HttpStatus.NOT_FOUND) :
                 new ResponseEntity<>(fromClientList, HttpStatus.OK);
 
 

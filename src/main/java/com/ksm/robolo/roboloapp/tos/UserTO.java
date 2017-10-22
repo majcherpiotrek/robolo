@@ -1,8 +1,7 @@
 package com.ksm.robolo.roboloapp.tos;
 
-
 public class UserTO {
-    private Long id;
+
     private String username;
 
     private String name;
@@ -13,13 +12,7 @@ public class UserTO {
 
     private String password;
 
-    public Long getId() {
-        return id;
-    }
-
-    public void setId(Long id) {
-        this.id = id;
-    }
+    private String matchingPassword;
 
     public String getUsername() {
         return username;
@@ -59,5 +52,13 @@ public class UserTO {
 
     public void setPassword(String password) {
         this.password = password;
+    }
+
+    public String getMatchingPassword() {
+        return matchingPassword;
+    }
+
+    public void setMatchingPassword(String matchingPassword) {
+        this.matchingPassword = matchingPassword;
     }
 }

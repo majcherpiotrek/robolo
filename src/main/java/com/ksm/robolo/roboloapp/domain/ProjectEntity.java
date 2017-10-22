@@ -14,6 +14,10 @@ public class ProjectEntity {
 	@GeneratedValue(strategy = GenerationType.AUTO)
 	private Long id;
 
+	@ManyToOne(targetEntity = UserEntity.class)
+    @NotNull
+	private UserEntity userEntity;
+
 	@NotNull
 	private String projectName;
 
@@ -38,6 +42,14 @@ public class ProjectEntity {
 
 	public void setId(Long id) {
 		this.id = id;
+	}
+
+	public UserEntity getUserEntity() {
+		return userEntity;
+	}
+
+	public void setUserEntity(UserEntity userEntity) {
+		this.userEntity = userEntity;
 	}
 
 	public String getProjectName() {
@@ -87,6 +99,7 @@ public class ProjectEntity {
 
 		ProjectEntity that = (ProjectEntity) o;
 
+        if(!getUserEntity().equals(that.getUserEntity())) return false;
 		if (!getProjectName().equals(that.getProjectName())) return false;
 		if (!getStartDate().equals(that.getStartDate())) return false;
 		if (!getAddress().equals(that.getAddress())) return false;
@@ -96,6 +109,7 @@ public class ProjectEntity {
 	@Override
 	public int hashCode() {
 		int result = getProjectName().hashCode();
+        result = 31 * result + getUserEntity().hashCode();
 		result = 31 * result + getStartDate().hashCode();
 		result = 31 * result + getAddress().hashCode();
 		result = 31 * result + getClient().hashCode();

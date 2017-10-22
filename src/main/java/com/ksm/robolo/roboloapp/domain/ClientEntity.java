@@ -14,6 +14,10 @@ public class ClientEntity {
 	@GeneratedValue(strategy = GenerationType.AUTO)
 	private Long id;
 
+	@ManyToOne(targetEntity = UserEntity.class)
+    @NotNull
+	private UserEntity userEntity;
+
 	@NotNull
 	private String name;
 
@@ -33,7 +37,15 @@ public class ClientEntity {
 	public void setId(Long id) {
 		this.id = id;
 	}
-	
+
+	public UserEntity getUserEntity() {
+		return userEntity;
+	}
+
+	public void setUserEntity(UserEntity userEntity) {
+		this.userEntity = userEntity;
+	}
+
 	public String getName() {
 		return name;
 	}
@@ -73,6 +85,7 @@ public class ClientEntity {
 
 		ClientEntity that = (ClientEntity) o;
 
+		if(!getUserEntity().equals(that.getUserEntity())) return false;
 		if (!getName().equals(that.getName())) return false;
 		if (!getSurname().equals(that.getSurname())) return false;
 		if (!getTelephoneNumbers().equals(that.getTelephoneNumbers())) return false;
@@ -82,6 +95,7 @@ public class ClientEntity {
 	@Override
 	public int hashCode() {
 		int result = getName().hashCode();
+		result = 31 * result + getUserEntity().hashCode();
 		result = 31 * result + getSurname().hashCode();
 		result = 31 * result + getTelephoneNumbers().hashCode();
 		result = 31 * result + (getEmailAddress() != null ? getEmailAddress().hashCode() : 0);
