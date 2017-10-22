@@ -20,9 +20,12 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.TransactionSystemException;
 import org.springframework.util.Assert;
 
+import javax.transaction.Transactional;
 import javax.validation.ConstraintViolation;
 import javax.validation.ConstraintViolationException;
 import java.util.Set;
+import java.util.Date;
+import java.util.UUID;
 
 @Service
 public class UserServiceImpl implements UserService {
@@ -110,6 +113,7 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
+    @Transactional
     public void createVerificationToken(String token, UserTO user) {
         VerificationToken userToken = new VerificationToken();
         userToken.setToken(token);
@@ -119,8 +123,22 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public void confirmUser(String verificationToken) throws RegistrationException {
-        UserEntity userEntity = findByVerificationToken(verificationToken);
+    public void confirmUser(String token) throws RegistrationException {
+        VerificationToken verificationToken = verificationTokenRepository.findByToken(token);
+
+        Date now = new Date();
+        if (verificationToken == null || now.after(verificationToken.getExpiryDate()) ) {
+
+            if (verificationToken != null) {
+                UUID uuid = verificationToken.getUser().getId();
+                verificationTokenRepository.delete(verificationToken.getId());
+                userRepository.delete(uuid);
+            }
+
+            throw new RegistrationException("We are sorry, your token is invalid or expired.");
+        }
+
+        UserEntity userEntity = findByVerificationToken(token);
 
         if (userEntity == null) {
             throw new RegistrationException("Could not verify - user does not exist!");
@@ -154,6 +172,7 @@ public class UserServiceImpl implements UserService {
         }
     }
 
+    @Transactional
     private void saveUser(UserEntity userEntity) {
         userEntity.setPassword(passwordEncoder.encode(userEntity.getPassword()));
         userRepository.save(userEntity);
