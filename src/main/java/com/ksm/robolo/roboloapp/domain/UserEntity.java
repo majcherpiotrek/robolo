@@ -1,6 +1,7 @@
 package com.ksm.robolo.roboloapp.domain;
 
 import org.hibernate.validator.constraints.Email;
+import org.hibernate.validator.constraints.Length;
 import org.hibernate.validator.constraints.NotEmpty;
 
 import javax.persistence.*;
@@ -15,27 +16,33 @@ public class UserEntity {
 	@GeneratedValue(strategy = GenerationType.AUTO)
 	private UUID id;
 
+	@Column(unique = true)
 	@NotEmpty(message = "Please provide your username")
-    @NotNull
+	@Length(min = 2, max = 50, message = "The username must be between 2 and 20 characters")
 	private String username;
 
 	@NotEmpty(message = "Please provide your first name")
-    @NotNull
 	private String name;
 
 	@NotEmpty(message = "Please provide your surname")
-    @NotNull
 	private String surname;
 
+	@Column(unique = true)
 	@Email(message = "Please provide a valid email")
 	@NotEmpty(message = "Please provide an email")
-	@NotNull
 	private String email;
 
     @NotEmpty(message = "Please provide a password")
-    @NotNull
+	@Length(min = 8, message = "The password must be at least 8 characters")
 	private String password;
 
+    private boolean enabled;
+
+    public UserEntity() {
+    	super();
+    	this.enabled = false;
+
+	}
 	public UUID getId() {
 		return id;
 	}
@@ -84,7 +91,15 @@ public class UserEntity {
 		this.password = password;
 	}
 
-    @Override
+	public boolean isEnabled() {
+		return enabled;
+	}
+
+	public void setEnabled(boolean enabled) {
+		this.enabled = enabled;
+	}
+
+	@Override
     public boolean equals(Object o) {
         if (this == o) return true;
         if (!(o instanceof UserEntity)) return false;

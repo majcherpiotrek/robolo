@@ -61,4 +61,16 @@ public class UserTO {
     public void setMatchingPassword(String matchingPassword) {
         this.matchingPassword = matchingPassword;
     }
+
+    @Override
+    public String toString() {
+        return "UserTO{" +
+                "username='" + username + '\'' +
+                ", name='" + name + '\'' +
+                ", surname='" + surname + '\'' +
+                ", email='" + email + '\'' +
+                ", password='" + password + '\'' +
+                ", matchingPassword='" + matchingPassword + '\'' +
+                '}';
+    }
 }
