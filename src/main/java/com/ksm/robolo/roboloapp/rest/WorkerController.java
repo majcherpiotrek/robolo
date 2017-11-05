@@ -9,7 +9,6 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequestMapping("/workers")
-@CrossOrigin
 public class WorkerController {
 
     private WorkerServiceImpl workerService;

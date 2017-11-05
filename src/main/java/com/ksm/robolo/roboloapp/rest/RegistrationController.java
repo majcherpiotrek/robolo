@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
 
+@CrossOrigin
 @RestController
 public class RegistrationController {
     private static final Logger logger = Logger.getLogger(RegistrationController.class);
@@ -31,7 +32,8 @@ public class RegistrationController {
         this.userService = userService;
         this.applicationEventPublisher = applicationEventPublisher;
     }
-
+    
+    @CrossOrigin
     @PostMapping(value = "/register", consumes = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<String> registerUser(HttpServletRequest request, @RequestBody UserTO userTO) {
         logger.info("Received request: " + userTO.toString());
@@ -45,7 +47,8 @@ public class RegistrationController {
 
         return new ResponseEntity<>(REGISTRATION_SUCCESS_MSG, HttpStatus.CREATED);
     }
-
+    
+    @CrossOrigin
     @GetMapping(value = "/confirm/{verificationToken}")
     public ResponseEntity<String> confirmUser(@PathVariable String verificationToken) {
         try {

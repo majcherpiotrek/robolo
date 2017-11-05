@@ -13,7 +13,6 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/projects")
-@CrossOrigin
 public class ProjectController {
 
     private static final Logger logger = Logger.getLogger(ProjectController.class);
@@ -27,7 +26,6 @@ public class ProjectController {
 
 
     @GetMapping(path = "/all")
-    @CrossOrigin
     public ResponseEntity<Iterable<ProjectTO>> getAllProjects() {
         Iterable<ProjectTO> projectTOS = projectService.getAllProjects();
         return projectTOS == null ? new ResponseEntity<>(HttpStatus.NOT_FOUND) : new ResponseEntity<>(projectTOS, HttpStatus.OK);
@@ -35,7 +33,6 @@ public class ProjectController {
 
 
     @GetMapping(path = "/stubs/all")
-    @CrossOrigin
     public ResponseEntity<Iterable<ProjectStubTO>> getAllProjectStubs() {
         final Iterable<ProjectStubTO> allProjectsStubs = projectService.getAllProjectsStubs();
 
@@ -47,7 +44,6 @@ public class ProjectController {
     }
 
     @GetMapping(path = "/{projectId}")
-    @CrossOrigin
     public ResponseEntity<ProjectTO> getProject(@PathVariable String projectId) {
         ProjectTO projectTO = null;
 
@@ -61,7 +57,6 @@ public class ProjectController {
 
 
     @GetMapping(path = "/byclient/{clientId}")
-    @CrossOrigin
     public ResponseEntity<Iterable<ProjectStubTO>> getAllProjectsStubForClientId(@PathVariable String clientId) {
         List<ProjectStubTO> fromClientList = null;
 

@@ -11,6 +11,7 @@ import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/password")
+@CrossOrigin
 public class PasswordController {
 
     private final UserService userService;
@@ -22,6 +23,7 @@ public class PasswordController {
     }
 
     @GetMapping("/retrieve/username/{username}")
+    @CrossOrigin
     public ResponseEntity<String> retrievePasswordByUsername(@PathVariable String username) {
 
         try {
@@ -34,6 +36,7 @@ public class PasswordController {
     }
 
     @GetMapping("/retrieve/email/{email}")
+    @CrossOrigin
     public ResponseEntity<String> retrievePasswordByEmail(@PathVariable String email) {
 
         try {
@@ -46,6 +49,7 @@ public class PasswordController {
     }
 
     @PostMapping(value = "/retrieve/newpassword", consumes = MediaType.APPLICATION_JSON_VALUE)
+    @CrossOrigin
     public ResponseEntity<String> changeRetrievedPassword(@RequestBody RetrievePasswordTO retrievePasswordTO) {
 
         try {
