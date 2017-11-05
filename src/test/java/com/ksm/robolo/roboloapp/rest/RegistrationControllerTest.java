@@ -2,6 +2,7 @@ package com.ksm.robolo.roboloapp.rest;
 
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.ksm.robolo.roboloapp.RoboloAppApplication;
+import com.ksm.robolo.roboloapp.domain.UserEntity;
 import com.ksm.robolo.roboloapp.repository.UserRepository;
 import com.ksm.robolo.roboloapp.repository.VerificationTokenRepository;
 import com.ksm.robolo.roboloapp.services.exceptions.RegistrationException;
@@ -31,8 +32,8 @@ public class RegistrationControllerTest {
     private UserTO userTO;
     private static final String name = "name";
     private static final String surname = "surname";
-    private static final String username = "piotrek";
-    private static final String password = "password";
+    private static final String username = "randomuser";
+    private static final String password = "randompassword";
     private static final String email = "robolify@gmail.com";
 
     @LocalServerPort
@@ -62,7 +63,10 @@ public class RegistrationControllerTest {
         restTemplate.getRestTemplate().getMessageConverters().add(jsonHttpMessageConverter);
 
         verificationTokenRepository.deleteAll();
-        userRepository.deleteAll();
+        UserEntity toDelete = userRepository.findByUsername(username);
+        if (null != toDelete) {
+        	userRepository.delete(toDelete);
+        }
     }
 
     @Test

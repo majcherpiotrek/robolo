@@ -1,4 +1,4 @@
-package com.ksm.robolo.roboloapp.services.impl;
+package com.ksm.robolo.roboloapp;
 
 import java.util.Arrays;
 import java.util.Date;
@@ -8,6 +8,8 @@ import java.util.UUID;
 
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.ApplicationArguments;
+import org.springframework.boot.ApplicationRunner;
 import org.springframework.stereotype.Service;
 
 import com.ksm.robolo.roboloapp.domain.AddressEntity;
@@ -27,7 +29,7 @@ import com.ksm.robolo.roboloapp.services.exceptions.RegistrationException;
 import com.ksm.robolo.roboloapp.tos.UserTO;
 
 @Service
-public class DevelopmentDataLoader {
+public class DevelopmentDataLoader implements ApplicationRunner {
 	
 	private static final Logger logger = Logger.getLogger(DevelopmentDataLoader.class);
 	
@@ -52,19 +54,6 @@ public class DevelopmentDataLoader {
 		this.addressRepository = addressRepository;
 		this.projectRepository = projectRepository;
 		this.workerRepository = workerRepository;
-		
-		try {
-			UserTO userTO = createAndRegisterTestUser();
-			UserEntity user = userService.findByEmail(userTO.getEmail());
-			
-			ClientEntity client = createAndSaveClientEntity(user);
-			AddressEntity address = createAndSaveAddressEntity();
-			List<WorkerEntity> workers = (List<WorkerEntity>) createAndSaveWorkersList(user);
-			createAndSaveProjectEntity(address, client, user, workers);
-		} catch (RegistrationException e) {
-			logger.error("Failed to create test user");
-		}
-		
 	}
 	
 	private Iterable<WorkerEntity> createAndSaveWorkersList(UserEntity user) {
@@ -130,6 +119,22 @@ public class DevelopmentDataLoader {
         userService.createVerificationToken(token, userTO);
         userService.confirmUser(token);
         return userTO;
+	}
+
+	@Override
+	public void run(ApplicationArguments arg0) throws Exception {
+		try {
+			UserTO userTO = createAndRegisterTestUser();
+			UserEntity user = userService.findByEmail(userTO.getEmail());
+			
+			ClientEntity client = createAndSaveClientEntity(user);
+			AddressEntity address = createAndSaveAddressEntity();
+			List<WorkerEntity> workers = (List<WorkerEntity>) createAndSaveWorkersList(user);
+			createAndSaveProjectEntity(address, client, user, workers);
+		} catch (RegistrationException e) {
+			logger.error("Failed to create test user");
+		}
+		
 	}
 
 }
