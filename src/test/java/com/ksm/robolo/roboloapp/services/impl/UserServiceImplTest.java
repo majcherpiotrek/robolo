@@ -1,10 +1,5 @@
 package com.ksm.robolo.roboloapp.services.impl;
 
-import com.ksm.robolo.roboloapp.repository.UserRepository;
-import com.ksm.robolo.roboloapp.repository.VerificationTokenRepository;
-import com.ksm.robolo.roboloapp.services.UserService;
-import com.ksm.robolo.roboloapp.services.exceptions.RegistrationException;
-import com.ksm.robolo.roboloapp.tos.UserTO;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -12,7 +7,13 @@ import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.junit4.SpringRunner;
-import sun.security.ec.ECDHKeyAgreement;
+
+import com.ksm.robolo.roboloapp.domain.UserEntity;
+import com.ksm.robolo.roboloapp.repository.UserRepository;
+import com.ksm.robolo.roboloapp.repository.VerificationTokenRepository;
+import com.ksm.robolo.roboloapp.services.UserService;
+import com.ksm.robolo.roboloapp.services.exceptions.RegistrationException;
+import com.ksm.robolo.roboloapp.tos.UserTO;
 
 @RunWith(SpringRunner.class)
 @SpringBootTest
@@ -20,8 +21,8 @@ public class UserServiceImplTest {
 
     private static final String name = "name";
     private static final String surname = "surname";
-    private static final String username = "username";
-    private static final String password = "password";
+    private static final String username = "randomusername";
+    private static final String password = "radnompassword";
     private static final String email = "e@mail.com";
 
     private static UserTO userTO;
@@ -38,7 +39,10 @@ public class UserServiceImplTest {
     @Before
     public void initRepoWithCorrectData() throws RegistrationException {
         verificationTokenRepository.deleteAll();
-        userRepository.deleteAll();
+        UserEntity toDelete = userRepository.findByUsername(username);
+        if (null != toDelete) {
+        	userRepository.delete(toDelete);
+        }
         userTO = new UserTO();
         userTO.setName(name);
         userTO.setSurname(surname);
@@ -58,7 +62,7 @@ public class UserServiceImplTest {
 
     @Test(expected = RegistrationException.class)
     public void registerUserWithSameUsernameShouldThrowException() throws Exception {
-        userTO.setUsername("username");
+        userTO.setUsername(username);
         userTO.setEmail("e2@mail.com");
         userService.registerUser(userTO);
     }
