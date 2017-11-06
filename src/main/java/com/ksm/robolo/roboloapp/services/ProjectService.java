@@ -7,11 +7,11 @@ import java.util.List;
 
 public interface ProjectService {
 
-    List<ProjectTO> getAllProjects();
+    List<ProjectTO> getAllProjects(String username);
 
-    List<ProjectStubTO> getAllProjectsStubs();
+    List<ProjectStubTO> getAllProjectsStubs(String username);
 
-    List<ProjectStubTO> getAllProjectStubsFromClient(Long clientId);
+    List<ProjectStubTO> getAllProjectStubsFromClient(String username, Long clientId);
 
-    ProjectTO getProject(Long projectId);
+    ProjectTO getProject(String username, Long projectId);
 }

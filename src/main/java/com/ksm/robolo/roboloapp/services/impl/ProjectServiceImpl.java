@@ -1,10 +1,13 @@
 package com.ksm.robolo.roboloapp.services.impl;
 
 import com.ksm.robolo.roboloapp.domain.ProjectEntity;
+import com.ksm.robolo.roboloapp.domain.UserEntity;
 import com.ksm.robolo.roboloapp.repository.ProjectRepository;
 import com.ksm.robolo.roboloapp.repository.TaskRepository;
+import com.ksm.robolo.roboloapp.repository.UserRepository;
 import com.ksm.robolo.roboloapp.services.EstimationService;
 import com.ksm.robolo.roboloapp.services.ProjectService;
+import com.ksm.robolo.roboloapp.services.UserService;
 import com.ksm.robolo.roboloapp.services.util.impl.ProjectEntityToStubConverter;
 import com.ksm.robolo.roboloapp.services.util.impl.ProjectEntityToTOConverter;
 import com.ksm.robolo.roboloapp.services.util.impl.TaskToTOConverter;
@@ -19,6 +22,7 @@ import org.springframework.util.Assert;
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.UUID;
 
 @Service
 public class ProjectServiceImpl implements ProjectService {
@@ -29,63 +33,85 @@ public class ProjectServiceImpl implements ProjectService {
     private ProjectRepository projectRepository;
     private TaskRepository taskRepository;
     private ProjectEntityToTOConverter projectEntityToTOConverter;
+    private ProjectEntityToStubConverter projectEntityToStubConverter;
     private TaskToTOConverter taskToTOConverter;
     private EstimationService estimationService;
-
+    private UserService userService;
+    
     @Autowired
-    public ProjectServiceImpl(ProjectRepository projectRepository, TaskRepository taskRepository, EstimationService estimationService) {
+    public ProjectServiceImpl(ProjectRepository projectRepository, TaskRepository taskRepository, UserService userService, EstimationService estimationService) {
         this.projectRepository = projectRepository;
         this.taskRepository = taskRepository;
+        this.userService = userService;
         this.projectEntityToTOConverter = new ProjectEntityToTOConverter();
+        this.projectEntityToStubConverter = new ProjectEntityToStubConverter();
         this.taskToTOConverter = new TaskToTOConverter();
         this.estimationService = estimationService;
     }
 
 
     @Override
-    public List<ProjectTO> getAllProjects() {
-        List<ProjectEntity> projectEntityList = projectRepository.findAll();
-        List<ProjectTO> projectTOList = new LinkedList<>();
+    public List<ProjectTO> getAllProjects(String username) {
+    	List<ProjectTO> projectTOList = new LinkedList<>();
+    	UUID userId = userService.getUserId(username);
+    	
+    	if (userId != null) {
+    		List<ProjectEntity> projectEntityList = projectRepository.findAllByUserEntityId(userId);
+        
+    		if (projectEntityList != null) {
+                for (ProjectEntity projectEntity : projectEntityList) {
+                    ProjectTO projectTO = projectEntityToTOConverter.convertToTO(projectEntity);
+                    List<TaskTO> taskTOList = taskToTOConverter.convertListToTOList(taskRepository.findByProject_Id(projectEntity.getId()));
+                    projectTO.setTaskTOS(taskTOList);
+                    projectTO.setApproximateEndDate(estimationService.estimateProjectEndDate(projectTO));
 
-        if (!projectEntityList.isEmpty()) {
-            for (ProjectEntity projectEntity : projectEntityList) {
-                ProjectTO projectTO = projectEntityToTOConverter.convertToTO(projectEntity);
-                List<TaskTO> taskTOList = taskToTOConverter.convertListToTOList(taskRepository.findByProject_Id(projectEntity.getId()));
-                projectTO.setTaskTOS(taskTOList);
-                projectTO.setApproximateEndDate(estimationService.estimateProjectEndDate(projectTO));
-
-                projectTOList.add(projectTO);
+                    projectTOList.add(projectTO);
+                }
             }
-        }
+    	}
+        
         return projectTOList;
     }
 
     @Override
-    public List<ProjectStubTO> getAllProjectsStubs() {
-        List<ProjectEntity> projectEntityList = projectRepository.findAll();
-        List<ProjectStubTO> projectStubs
-                = new ProjectEntityToStubConverter().convertListToTOList(projectEntityList);
+    public List<ProjectStubTO> getAllProjectsStubs(String username) {
+    	UUID userId = userService.getUserId(username);
+    	List<ProjectStubTO> projectStubs = new ArrayList<>();
+    	
+    	if (userId != null) {
+    		List<ProjectEntity> projectEntityList = projectRepository.findAllByUserEntityId(userId);
+    		if (projectEntityList != null) {
+    			projectStubs = projectEntityToStubConverter.convertListToTOList(projectEntityList);
+    		} 
+    	}
+     
         return projectStubs;
     }
 
     @Override
-    public List<ProjectStubTO> getAllProjectStubsFromClient(Long clientId) {
-
-        List<ProjectEntity> projectEntityList = projectRepository.findAllByClientId(clientId);
-        List<ProjectStubTO> projectStubsWithClientId = new LinkedList<>();
-        if (projectEntityList != null) {
-            for (ProjectEntity projectEntity : projectEntityList) {
-                    ProjectStubTO stub = new ProjectEntityToStubConverter().convertToTO(projectEntity);
-                    projectStubsWithClientId.add(stub);
-            }
-        }
+    public List<ProjectStubTO> getAllProjectStubsFromClient(String username, Long clientId) {
+    	UUID userId = userService.getUserId(username);
+    	List<ProjectStubTO> projectStubsWithClientId = new ArrayList<>();
+    	
+    	if (userId != null) {
+    		List<ProjectEntity> projectEntityList = projectRepository.findAllByUserEntityIdAndClientId(userId, clientId);
+    		if (projectEntityList != null) {
+    			projectStubsWithClientId = projectEntityToStubConverter.convertListToTOList(projectEntityList);
+    		} 
+    	}
+        
         return projectStubsWithClientId;
     }
 
     @Override
-    public ProjectTO getProject(Long projectId) {
+    public ProjectTO getProject(String username, Long projectId) {
+    	ProjectTO projectTO = null;
         final ProjectEntity projectEntity = projectRepository.findOne(projectId);
-        ProjectTO projectTO = projectEntityToTOConverter.convertToTO(projectEntity);
+        if (projectEntity != null) {
+        	if (projectEntity.getUserEntity().getUsername().equals(username)) {
+        		projectTO = projectEntityToTOConverter.convertToTO(projectEntity);
+        	}	
+        }
         return projectTO;
     }
 }

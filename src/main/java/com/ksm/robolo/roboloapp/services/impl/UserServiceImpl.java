@@ -58,16 +58,6 @@ public class UserServiceImpl implements UserService, UserDetailsService {
     }
 
     @Override
-    public UserEntity findByEmail(String email) {
-        return userRepository.findByEmail(email);
-    }
-
-    @Override
-    public UserEntity findByUsername(String username) {
-        return userRepository.findByUsername(username);
-    }
-
-    @Override
     public void registerUser(UserTO userTO) throws RegistrationException {
 
         try {
@@ -107,17 +97,6 @@ public class UserServiceImpl implements UserService, UserDetailsService {
             e.printStackTrace();
             throw new RegistrationException(errorMessage);
         }
-    }
-
-    @Override
-    public UserEntity getLoggedInUser() {
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        UserEntity userEntity = null;
-        if (!(authentication instanceof AnonymousAuthenticationToken)) {
-            String currentUsername = authentication.getName();
-            userEntity = userRepository.findByUsername(currentUsername);
-        }
-        return userEntity;
     }
 
     @Override
@@ -215,7 +194,17 @@ public class UserServiceImpl implements UserService, UserDetailsService {
             throw new RetrievePasswordException(e.getMessage());
         }
     }
-
+    
+	@Override
+	public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
+		UserEntity userEntity = userRepository.findByUsername(username);
+		
+		if (userEntity == null) {
+			throw new UsernameNotFoundException(username);
+		}
+		return new User(userEntity.getUsername(), userEntity.getPassword(), emptyList());
+	}
+	
     private void validateRetrievedPassword(RetrievePasswordTO retrievePasswordTO) {
         Assert.notNull(retrievePasswordTO, "Please provide new password!");
         Assert.isTrue(retrievePasswordTO.getPassword().equals(retrievePasswordTO.getMatchingPassword()), "The passwords don't match!");
@@ -263,14 +252,18 @@ public class UserServiceImpl implements UserService, UserDetailsService {
         email.setText("Copy this token to change your password: " + token);
         emailService.sendMail(email);
     }
+    
+    private UserEntity findByEmail(String email) {
+        return userRepository.findByEmail(email);
+    }
+
+    private UserEntity findByUsername(String username) {
+        return userRepository.findByUsername(username);
+    }
 
 	@Override
-	public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
+	public UUID getUserId(String username) {
 		UserEntity userEntity = userRepository.findByUsername(username);
-		
-		if (userEntity == null) {
-			throw new UsernameNotFoundException(username);
-		}
-		return new User(userEntity.getUsername(), userEntity.getPassword(), emptyList());
+		return userEntity == null ? null : userEntity.getId();
 	}
 }

@@ -22,6 +22,7 @@ import com.ksm.robolo.roboloapp.repository.ClientRepository;
 import com.ksm.robolo.roboloapp.repository.ProjectRepository;
 import com.ksm.robolo.roboloapp.repository.TaskItemRepository;
 import com.ksm.robolo.roboloapp.repository.TaskRepository;
+import com.ksm.robolo.roboloapp.repository.UserRepository;
 import com.ksm.robolo.roboloapp.repository.WorkerRepository;
 import com.ksm.robolo.roboloapp.services.UserService;
 import com.ksm.robolo.roboloapp.services.exceptions.RegistrationException;
@@ -33,6 +34,7 @@ public class DevelopmentDataLoader implements ApplicationRunner {
 	private static final Logger logger = Logger.getLogger(DevelopmentDataLoader.class);
 	
 	private UserService userService;
+	private UserRepository userRepository;
 	private ClientRepository clientRepository;
 	private AddressRepository addressRepository;
 	private ProjectRepository projectRepository;
@@ -40,7 +42,8 @@ public class DevelopmentDataLoader implements ApplicationRunner {
 	
 	@Autowired
 	public DevelopmentDataLoader(
-			UserService userService, 
+			UserService userService,
+			UserRepository userRepository,
 			ProjectRepository projectRepository,
 			ClientRepository clientRepository,
 			WorkerRepository workerRepository,
@@ -49,6 +52,7 @@ public class DevelopmentDataLoader implements ApplicationRunner {
 			AddressRepository addressRepository) {
 		
 		this.userService = userService;
+		this.userRepository = userRepository;
 		this.clientRepository = clientRepository;
 		this.addressRepository = addressRepository;
 		this.projectRepository = projectRepository;
@@ -124,7 +128,7 @@ public class DevelopmentDataLoader implements ApplicationRunner {
 	public void run(ApplicationArguments arg0) throws Exception {
 		try {
 			UserTO userTO = createAndRegisterTestUser();
-			UserEntity user = userService.findByEmail(userTO.getEmail());
+			UserEntity user = userRepository.findByEmail(userTO.getEmail());
 			
 			ClientEntity client = createAndSaveClientEntity(user);
 			AddressEntity address = createAndSaveAddressEntity();

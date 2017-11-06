@@ -28,16 +28,14 @@ public class ProjectController {
 
     @GetMapping(path = "/all")
     public ResponseEntity<Iterable<ProjectTO>> getAllProjects(Principal principal) {
-    	// TODO return only projects that belong to the logged in user (principal)
-        Iterable<ProjectTO> projectTOS = projectService.getAllProjects();
+        Iterable<ProjectTO> projectTOS = projectService.getAllProjects(principal.getName());
         return projectTOS == null ? new ResponseEntity<>(HttpStatus.NOT_FOUND) : new ResponseEntity<>(projectTOS, HttpStatus.OK);
     }
 
 
     @GetMapping(path = "/stubs/all")
     public ResponseEntity<Iterable<ProjectStubTO>> getAllProjectStubs(Principal principal) {
-    	// TODO return only projects that belong to the logged in user (principal)
-        final Iterable<ProjectStubTO> allProjectsStubs = projectService.getAllProjectsStubs();
+        final Iterable<ProjectStubTO> allProjectsStubs = projectService.getAllProjectsStubs(principal.getName());
         return allProjectsStubs == null ?
                 new ResponseEntity<Iterable<ProjectStubTO>>(HttpStatus.NOT_FOUND)
                 : new ResponseEntity<>(allProjectsStubs, HttpStatus.OK);
@@ -46,10 +44,9 @@ public class ProjectController {
 
     @GetMapping(path = "/{projectId}")
     public ResponseEntity<ProjectTO> getProject(@PathVariable String projectId, Principal principal) {
-    	// TODO return only projects that belong to the logged in user (principal)
     	ProjectTO projectTO = null;
         Long projectIdLong = Long.valueOf(projectId);
-        projectTO = projectService.getProject(projectIdLong);
+        projectTO = projectService.getProject(principal.getName(), projectIdLong);
 
 
         return projectTO == null ? new ResponseEntity<ProjectTO>(HttpStatus.NOT_FOUND) :
@@ -59,16 +56,13 @@ public class ProjectController {
 
     @GetMapping(path = "/byclient/{clientId}")
     public ResponseEntity<Iterable<ProjectStubTO>> getAllProjectsStubForClientId(@PathVariable String clientId, Principal principal) {
-    	// TODO return only projects that belong to the logged in user (principal)
     	List<ProjectStubTO> fromClientList = null;
         Long clientIdLong = Long.valueOf(clientId);
-        fromClientList = projectService.getAllProjectStubsFromClient(clientIdLong);
+        fromClientList = projectService.getAllProjectStubsFromClient(principal.getName(), clientIdLong);
 
         return fromClientList == null ?
                 new ResponseEntity<>(HttpStatus.NOT_FOUND) :
                 new ResponseEntity<>(fromClientList, HttpStatus.OK);
-
-
     }
 
 
