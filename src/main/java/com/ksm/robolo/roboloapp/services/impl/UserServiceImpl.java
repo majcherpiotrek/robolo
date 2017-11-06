@@ -15,6 +15,10 @@ import org.springframework.mail.SimpleMailMessage;
 import org.springframework.security.authentication.AnonymousAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.User;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.TransactionSystemException;
@@ -26,9 +30,10 @@ import javax.validation.ConstraintViolationException;
 import java.util.Set;
 import java.util.Date;
 import java.util.UUID;
+import static java.util.Collections.emptyList;
 
 @Service
-public class UserServiceImpl implements UserService {
+public class UserServiceImpl implements UserService, UserDetailsService {
 
     private static final Logger logger = Logger.getLogger(UserServiceImpl.class);
 
@@ -258,4 +263,14 @@ public class UserServiceImpl implements UserService {
         email.setText("Copy this token to change your password: " + token);
         emailService.sendMail(email);
     }
+
+	@Override
+	public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
+		UserEntity userEntity = userRepository.findByUsername(username);
+		
+		if (userEntity == null) {
+			throw new UsernameNotFoundException(username);
+		}
+		return new User(userEntity.getUsername(), userEntity.getPassword(), emptyList());
+	}
 }

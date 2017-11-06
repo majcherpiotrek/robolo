@@ -9,6 +9,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.security.Principal;
 import java.util.List;
 
 @RestController
@@ -26,14 +27,16 @@ public class ProjectController {
 
 
     @GetMapping(path = "/all")
-    public ResponseEntity<Iterable<ProjectTO>> getAllProjects() {
+    public ResponseEntity<Iterable<ProjectTO>> getAllProjects(Principal principal) {
+    	// TODO return only projects that belong to the logged in user (principal)
         Iterable<ProjectTO> projectTOS = projectService.getAllProjects();
         return projectTOS == null ? new ResponseEntity<>(HttpStatus.NOT_FOUND) : new ResponseEntity<>(projectTOS, HttpStatus.OK);
     }
 
 
     @GetMapping(path = "/stubs/all")
-    public ResponseEntity<Iterable<ProjectStubTO>> getAllProjectStubs() {
+    public ResponseEntity<Iterable<ProjectStubTO>> getAllProjectStubs(Principal principal) {
+    	// TODO return only projects that belong to the logged in user (principal)
         final Iterable<ProjectStubTO> allProjectsStubs = projectService.getAllProjectsStubs();
         return allProjectsStubs == null ?
                 new ResponseEntity<Iterable<ProjectStubTO>>(HttpStatus.NOT_FOUND)
@@ -42,9 +45,9 @@ public class ProjectController {
     }
 
     @GetMapping(path = "/{projectId}")
-    public ResponseEntity<ProjectTO> getProject(@PathVariable String projectId) {
-        ProjectTO projectTO = null;
-
+    public ResponseEntity<ProjectTO> getProject(@PathVariable String projectId, Principal principal) {
+    	// TODO return only projects that belong to the logged in user (principal)
+    	ProjectTO projectTO = null;
         Long projectIdLong = Long.valueOf(projectId);
         projectTO = projectService.getProject(projectIdLong);
 
@@ -55,9 +58,9 @@ public class ProjectController {
 
 
     @GetMapping(path = "/byclient/{clientId}")
-    public ResponseEntity<Iterable<ProjectStubTO>> getAllProjectsStubForClientId(@PathVariable String clientId) {
-        List<ProjectStubTO> fromClientList = null;
-
+    public ResponseEntity<Iterable<ProjectStubTO>> getAllProjectsStubForClientId(@PathVariable String clientId, Principal principal) {
+    	// TODO return only projects that belong to the logged in user (principal)
+    	List<ProjectStubTO> fromClientList = null;
         Long clientIdLong = Long.valueOf(clientId);
         fromClientList = projectService.getAllProjectStubsFromClient(clientIdLong);
 
