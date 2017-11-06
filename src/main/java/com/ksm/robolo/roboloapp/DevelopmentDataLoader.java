@@ -10,7 +10,7 @@ import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.ApplicationArguments;
 import org.springframework.boot.ApplicationRunner;
-import org.springframework.stereotype.Service;
+import org.springframework.stereotype.Component;
 
 import com.ksm.robolo.roboloapp.domain.AddressEntity;
 import com.ksm.robolo.roboloapp.domain.ClientEntity;
@@ -22,13 +22,12 @@ import com.ksm.robolo.roboloapp.repository.ClientRepository;
 import com.ksm.robolo.roboloapp.repository.ProjectRepository;
 import com.ksm.robolo.roboloapp.repository.TaskItemRepository;
 import com.ksm.robolo.roboloapp.repository.TaskRepository;
-import com.ksm.robolo.roboloapp.repository.UserRepository;
 import com.ksm.robolo.roboloapp.repository.WorkerRepository;
 import com.ksm.robolo.roboloapp.services.UserService;
 import com.ksm.robolo.roboloapp.services.exceptions.RegistrationException;
 import com.ksm.robolo.roboloapp.tos.UserTO;
 
-@Service
+@Component
 public class DevelopmentDataLoader implements ApplicationRunner {
 	
 	private static final Logger logger = Logger.getLogger(DevelopmentDataLoader.class);
