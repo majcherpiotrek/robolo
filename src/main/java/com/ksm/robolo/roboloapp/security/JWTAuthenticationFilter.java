@@ -9,6 +9,7 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.apache.log4j.Logger;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -23,6 +24,8 @@ import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 
 public class JWTAuthenticationFilter extends UsernamePasswordAuthenticationFilter {
+	
+	private static final Logger logger = Logger.getLogger(JWTAuthenticationFilter.class);
 	
 	private AuthenticationManager authenticationManager;
 
@@ -54,13 +57,13 @@ public class JWTAuthenticationFilter extends UsernamePasswordAuthenticationFilte
                                             HttpServletResponse res,
                                             FilterChain chain,
                                             Authentication auth) throws IOException, ServletException {
-
+    	logger.info("Building token for: " + ((User) auth.getPrincipal()).getUsername());
         String token = Jwts.builder()
                 .setSubject(((User) auth.getPrincipal()).getUsername())
                 .setExpiration(new Date(System.currentTimeMillis() + SecurityConstants.EXPIRATION_TIME))
                 .signWith(SignatureAlgorithm.HS512, SecurityConstants.SECRET.getBytes())
                 .compact();
-        res.addHeader(SecurityConstants.HEADER_STRING, SecurityConstants.TOKEN_PREFIX + token);
-        res.addHeader(SecurityConstants.EXPOSE_HEADERS, SecurityConstants.HEADER_STRING);
+        res.addHeader(SecurityConstants.AUTH_HEADER_STRING, SecurityConstants.TOKEN_PREFIX + token);
+        res.addHeader(SecurityConstants.EXPOSE_HEADERS, SecurityConstants.AUTH_HEADER_STRING);
     }
 }

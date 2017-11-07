@@ -8,6 +8,7 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.apache.log4j.Logger;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -17,6 +18,8 @@ import io.jsonwebtoken.Jwts;
 
 public class JWTAuthorizationFilter extends BasicAuthenticationFilter {
 	
+	private static final Logger logger = Logger.getLogger(JWTAuthorizationFilter.class);
+	
 	public JWTAuthorizationFilter(AuthenticationManager authenticationManager) {
 		super(authenticationManager);
 	}
@@ -25,7 +28,7 @@ public class JWTAuthorizationFilter extends BasicAuthenticationFilter {
     protected void doFilterInternal(HttpServletRequest req,
                                     HttpServletResponse res,
                                     FilterChain chain) throws IOException, ServletException {
-        String header = req.getHeader(SecurityConstants.HEADER_STRING);
+        String header = req.getHeader(SecurityConstants.AUTH_HEADER_STRING);
 
         if (header == null || !header.startsWith(SecurityConstants.TOKEN_PREFIX)) {
             chain.doFilter(req, res);
@@ -39,7 +42,7 @@ public class JWTAuthorizationFilter extends BasicAuthenticationFilter {
     }
 
     private UsernamePasswordAuthenticationToken getAuthentication(HttpServletRequest request) {
-        String token = request.getHeader(SecurityConstants.HEADER_STRING);
+        String token = request.getHeader(SecurityConstants.AUTH_HEADER_STRING);
         if (token != null) {
             // parse the token.
             String user = Jwts.parser()
@@ -47,7 +50,8 @@ public class JWTAuthorizationFilter extends BasicAuthenticationFilter {
                     .parseClaimsJws(token.replace(SecurityConstants.TOKEN_PREFIX, ""))
                     .getBody()
                     .getSubject();
-
+            
+            logger.info("User parsed from token: " + user);
             if (user != null) {
                 return new UsernamePasswordAuthenticationToken(user, null, new ArrayList<>());
             }

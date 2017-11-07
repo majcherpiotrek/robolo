@@ -26,6 +26,7 @@ import com.ksm.robolo.roboloapp.repository.UserRepository;
 import com.ksm.robolo.roboloapp.repository.WorkerRepository;
 import com.ksm.robolo.roboloapp.services.UserService;
 import com.ksm.robolo.roboloapp.services.exceptions.RegistrationException;
+import com.ksm.robolo.roboloapp.tos.ClientTO;
 import com.ksm.robolo.roboloapp.tos.UserTO;
 
 @Component
@@ -64,8 +65,8 @@ public class DevelopmentDataLoader implements ApplicationRunner {
 		
 		for (int i = 0; i<10; i++) {
 			WorkerEntity workerEntity = new WorkerEntity();
-			workerEntity.setName("Robol" + i);
-			workerEntity.setSurname("Robolowski" + i);
+			workerEntity.setName("Robol" + user.getUsername());
+			workerEntity.setSurname("Robolowski" + user.getUsername());
 			workerEntity.setTelephoneNumbers(Arrays.asList("11111111" + i));
 			workerEntity.setUserEntity(user);
 			workers.add(workerEntity);
@@ -81,41 +82,41 @@ public class DevelopmentDataLoader implements ApplicationRunner {
 		ProjectEntity projectEntity = new ProjectEntity();
 		projectEntity.setAddress(address);
 		projectEntity.setClient(client);
-		projectEntity.setProjectName("Projekt testowy");
+		projectEntity.setProjectName("Project from client " + client.getName() + " from user " + user.getUsername());
 		projectEntity.setStartDate(new Date());
 		projectEntity.setUserEntity(user);
 		projectEntity.setWorkers(workers);
 		projectRepository.save(projectEntity);
 	}
-	private AddressEntity createAndSaveAddressEntity() {
+	private AddressEntity createAndSaveAddressEntity(String street, String houseNumber, String apartmentNumber) {
 		AddressEntity addressEntity = new AddressEntity();
-		addressEntity.setApartmentNumber("1");
+		addressEntity.setApartmentNumber(apartmentNumber);
 		addressEntity.setCity("Wroclaw");
 		addressEntity.setCountry("Polsza");
-		addressEntity.setHouseNumber("69");
+		addressEntity.setHouseNumber(houseNumber);
 		addressEntity.setPostCode("11-234");
-		addressEntity.setStreet("Ulica");
+		addressEntity.setStreet(street);
 		return addressRepository.save(addressEntity);
 	}
 	
-	private ClientEntity createAndSaveClientEntity(UserEntity user) {
+	private ClientEntity createAndSaveClientEntity(UserEntity user, String clientEmail, String clientName, String clientSurname) {
 		ClientEntity clientEntity = new ClientEntity();
 		clientEntity.setUserEntity(user);
-		clientEntity.setName("Jan");
-		clientEntity.setEmailAddress("jakis@gmail.com");
-		clientEntity.setSurname("Kowalski");
+		clientEntity.setName(clientName);
+		clientEntity.setEmailAddress(clientEmail);
+		clientEntity.setSurname(clientSurname);
 		clientEntity.setTelephoneNumbers(Arrays.asList("123456789"));
 		return clientRepository.save(clientEntity);
 	}
 	
-	private UserTO createAndRegisterTestUser() throws RegistrationException {
+	private UserTO createAndRegisterTestUser(String username, String email) throws RegistrationException {
 		UserTO userTO = new UserTO();
 		userTO.setName("Piotrek");
 		userTO.setSurname("Majcher");
-		userTO.setEmail("piotr.majcher94@gmail.com");
+		userTO.setEmail(email);
 		userTO.setPassword("password");
 		userTO.setMatchingPassword("password");
-		userTO.setUsername("username");
+		userTO.setUsername(username);
 		
 		userService.registerUser(userTO);
 		String token = UUID.randomUUID().toString();
@@ -127,13 +128,19 @@ public class DevelopmentDataLoader implements ApplicationRunner {
 	@Override
 	public void run(ApplicationArguments arg0) throws Exception {
 		try {
-			UserTO userTO = createAndRegisterTestUser();
-			UserEntity user = userRepository.findByEmail(userTO.getEmail());
-			
-			ClientEntity client = createAndSaveClientEntity(user);
-			AddressEntity address = createAndSaveAddressEntity();
-			List<WorkerEntity> workers = (List<WorkerEntity>) createAndSaveWorkersList(user);
-			createAndSaveProjectEntity(address, client, user, workers);
+			List<UserTO> users = new LinkedList<>();
+			for (int i = 0; i < 4; i++) {
+				UserTO user = createAndRegisterTestUser("username" + i, "username" + i + "@example.com");
+				users.add(user);
+				UserEntity userEntity = userRepository.findByEmail(user.getEmail());
+				List<ClientEntity> userClients = new LinkedList<>();
+				for (int j = 0; j < 4; j++) {
+					ClientEntity client = createAndSaveClientEntity(userEntity, "client" + i + j + "@example.com", "Client" + i + j, "Surname" + i + j);
+					AddressEntity address = createAndSaveAddressEntity("Street" + i + j, String.valueOf(i), String.valueOf(j));
+					List<WorkerEntity> workers = (List<WorkerEntity>) createAndSaveWorkersList(userEntity);
+					createAndSaveProjectEntity(address, client, userEntity, workers);
+				}
+			}			
 		} catch (RegistrationException e) {
 			logger.error("Failed to create test user");
 		}
