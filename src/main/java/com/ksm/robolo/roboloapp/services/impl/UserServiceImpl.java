@@ -15,6 +15,10 @@ import org.springframework.mail.SimpleMailMessage;
 import org.springframework.security.authentication.AnonymousAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.User;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.TransactionSystemException;
@@ -26,9 +30,10 @@ import javax.validation.ConstraintViolationException;
 import java.util.Set;
 import java.util.Date;
 import java.util.UUID;
+import static java.util.Collections.emptyList;
 
 @Service
-public class UserServiceImpl implements UserService {
+public class UserServiceImpl implements UserService, UserDetailsService {
 
     private static final Logger logger = Logger.getLogger(UserServiceImpl.class);
 
@@ -50,16 +55,6 @@ public class UserServiceImpl implements UserService {
         this.passwordEncoder = passwordEncoder;
         this.verificationTokenRepository = verificationTokenRepository;
         this.emailService = emailService;
-    }
-
-    @Override
-    public UserEntity findByEmail(String email) {
-        return userRepository.findByEmail(email);
-    }
-
-    @Override
-    public UserEntity findByUsername(String username) {
-        return userRepository.findByUsername(username);
     }
 
     @Override
@@ -102,17 +97,6 @@ public class UserServiceImpl implements UserService {
             e.printStackTrace();
             throw new RegistrationException(errorMessage);
         }
-    }
-
-    @Override
-    public UserEntity getLoggedInUser() {
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        UserEntity userEntity = null;
-        if (!(authentication instanceof AnonymousAuthenticationToken)) {
-            String currentUsername = authentication.getName();
-            userEntity = userRepository.findByUsername(currentUsername);
-        }
-        return userEntity;
     }
 
     @Override
@@ -210,7 +194,17 @@ public class UserServiceImpl implements UserService {
             throw new RetrievePasswordException(e.getMessage());
         }
     }
-
+    
+	@Override
+	public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
+		UserEntity userEntity = userRepository.findByUsername(username);
+		
+		if (userEntity == null) {
+			throw new UsernameNotFoundException(username);
+		}
+		return new User(userEntity.getUsername(), userEntity.getPassword(), emptyList());
+	}
+	
     private void validateRetrievedPassword(RetrievePasswordTO retrievePasswordTO) {
         Assert.notNull(retrievePasswordTO, "Please provide new password!");
         Assert.isTrue(retrievePasswordTO.getPassword().equals(retrievePasswordTO.getMatchingPassword()), "The passwords don't match!");
@@ -258,4 +252,18 @@ public class UserServiceImpl implements UserService {
         email.setText("Copy this token to change your password: " + token);
         emailService.sendMail(email);
     }
+    
+    private UserEntity findByEmail(String email) {
+        return userRepository.findByEmail(email);
+    }
+
+    private UserEntity findByUsername(String username) {
+        return userRepository.findByUsername(username);
+    }
+
+	@Override
+	public UUID getUserId(String username) {
+		UserEntity userEntity = userRepository.findByUsername(username);
+		return userEntity == null ? null : userEntity.getId();
+	}
 }

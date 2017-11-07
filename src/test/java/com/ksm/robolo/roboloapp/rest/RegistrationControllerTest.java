@@ -5,9 +5,12 @@ import com.ksm.robolo.roboloapp.RoboloAppApplication;
 import com.ksm.robolo.roboloapp.domain.UserEntity;
 import com.ksm.robolo.roboloapp.repository.UserRepository;
 import com.ksm.robolo.roboloapp.repository.VerificationTokenRepository;
+import com.ksm.robolo.roboloapp.services.UserService;
 import com.ksm.robolo.roboloapp.services.exceptions.RegistrationException;
 import com.ksm.robolo.roboloapp.tos.UserTO;
 import org.apache.log4j.Logger;
+import org.json.JSONException;
+import org.json.JSONObject;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -20,6 +23,8 @@ import org.springframework.http.converter.json.MappingJackson2HttpMessageConvert
 import org.springframework.test.context.junit4.SpringRunner;
 
 import static org.junit.Assert.assertEquals;
+
+import java.util.UUID;
 
 @RunWith(SpringRunner.class)
 @SpringBootTest(classes = RoboloAppApplication.class, webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
@@ -47,6 +52,9 @@ public class RegistrationControllerTest {
 
     @Autowired
     private VerificationTokenRepository verificationTokenRepository;
+    
+    @Autowired
+    private UserService userService;
 
     @Before
     public void init() throws RegistrationException {
