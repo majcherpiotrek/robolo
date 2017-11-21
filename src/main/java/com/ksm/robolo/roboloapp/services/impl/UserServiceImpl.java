@@ -48,18 +48,27 @@ public class UserServiceImpl implements UserService, UserDetailsService {
     private final VerificationTokenRepository verificationTokenRepository;
 
     private final EmailService emailService;
+    
+    private final ExceptionUnwrapper exceptionUnwrapper;
 
     @Autowired
-    public UserServiceImpl(UserRepository userRepository, PasswordEncoder passwordEncoder, VerificationTokenRepository verificationTokenRepository, EmailService emailService) {
+    public UserServiceImpl(
+    		UserRepository userRepository, 
+    		PasswordEncoder passwordEncoder, 
+    		VerificationTokenRepository verificationTokenRepository, 
+    		EmailService emailService,
+    		ExceptionUnwrapper exceptionUnwrapper) {
         this.userRepository = userRepository;
         this.passwordEncoder = passwordEncoder;
         this.verificationTokenRepository = verificationTokenRepository;
         this.emailService = emailService;
+        this.exceptionUnwrapper = exceptionUnwrapper;
     }
 
     @Override
     public void registerUser(UserTO userTO) throws RegistrationException {
-
+    	
+    	
         try {
             validateUserRegistrationData(userTO);
             UserEntity userEntity = new UserEntity();
@@ -72,27 +81,8 @@ public class UserServiceImpl implements UserService, UserDetailsService {
             saveUser(userEntity);
         } catch (Exception e) {
 
-            String errorMessage = null;
-            if (e instanceof TransactionSystemException) {
-                Throwable cause = e.getCause();
-                while ( (cause != null) && !(cause instanceof ConstraintViolationException) ) {
-                    cause = cause.getCause();
-                }
-
-                if (cause != null) {
-                    StringBuilder message = new StringBuilder();
-                    Set<ConstraintViolation<?>> violations = ((ConstraintViolationException)cause).getConstraintViolations();
-                    for (ConstraintViolation<?> violation : violations) {
-                        message.append(violation.getMessage());
-                    }
-                    errorMessage = message.toString();
-                }
-            }
-
-            if (errorMessage == null) {
-                errorMessage = e.getMessage();
-            }
-
+        	String errorMessage = exceptionUnwrapper.getExceptionMessage(e);
+           
             logger.error("Exception occurred while trying to register new user: " + errorMessage + "\n");
             e.printStackTrace();
             throw new RegistrationException(errorMessage);

@@ -1,6 +1,7 @@
 package com.ksm.robolo.roboloapp.rest;
 
 import com.ksm.robolo.roboloapp.services.ProjectService;
+import com.ksm.robolo.roboloapp.services.exceptions.ProjectServiceException;
 import com.ksm.robolo.roboloapp.tos.ProjectStubTO;
 import com.ksm.robolo.roboloapp.tos.ProjectTO;
 import org.apache.log4j.Logger;
@@ -19,7 +20,8 @@ import java.util.List;
 public class ProjectController {
 
     private static final Logger logger = Logger.getLogger(ProjectController.class);
-
+    private static final String PROJECT_ADDED_MSG = "New project has been created";
+    
     private ProjectService projectService;
 
     @Autowired
@@ -66,6 +68,16 @@ public class ProjectController {
                 new ResponseEntity<>(HttpStatus.NOT_FOUND) :
                 new ResponseEntity<>(fromClientList, HttpStatus.OK);
     }
-
+    
+    @PostMapping("/projects/add")
+    public ResponseEntity<String> addProject(@RequestBody ProjectTO projectTO, Principal principal) {
+    	try {
+			projectService.addProject(principal.getName(), projectTO);
+		} catch (ProjectServiceException e) {
+			return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
+		}
+    	
+    	return new ResponseEntity<>(PROJECT_ADDED_MSG, HttpStatus.OK);
+    }
 
 }

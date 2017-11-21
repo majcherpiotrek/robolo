@@ -14,7 +14,7 @@ public class ProjectTO {
 
     private Date startDate;
 
-    private AddressEntity addressTO;
+    private AddressEntity address;
 
     private ClientTO clientTO;
 
@@ -48,12 +48,12 @@ public class ProjectTO {
         this.startDate = startDate;
     }
 
-    public AddressEntity getAddressTO() {
-        return addressTO;
+    public AddressEntity getAddress() {
+        return address;
     }
 
-    public void setAddressTO(AddressEntity addressTO) {
-        this.addressTO = addressTO;
+    public void setAddress(AddressEntity address) {
+        this.address = address;
     }
 
     public ClientTO getClientTO() {

@@ -1,5 +1,6 @@
 package com.ksm.robolo.roboloapp.services;
 
+import com.ksm.robolo.roboloapp.services.exceptions.ProjectServiceException;
 import com.ksm.robolo.roboloapp.tos.ProjectStubTO;
 import com.ksm.robolo.roboloapp.tos.ProjectTO;
 
@@ -14,4 +15,6 @@ public interface ProjectService {
     List<ProjectStubTO> getAllProjectStubsFromClient(String username, Long clientId);
 
     ProjectTO getProject(String username, Long projectId);
+
+	void addProject(String username, ProjectTO projectTO) throws ProjectServiceException;
 }

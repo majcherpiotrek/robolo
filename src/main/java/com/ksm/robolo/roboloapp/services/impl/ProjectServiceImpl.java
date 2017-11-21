@@ -1,5 +1,6 @@
 package com.ksm.robolo.roboloapp.services.impl;
 
+import com.ksm.robolo.roboloapp.domain.AddressEntity;
 import com.ksm.robolo.roboloapp.domain.ProjectEntity;
 import com.ksm.robolo.roboloapp.domain.UserEntity;
 import com.ksm.robolo.roboloapp.repository.ProjectRepository;
@@ -8,6 +9,8 @@ import com.ksm.robolo.roboloapp.repository.UserRepository;
 import com.ksm.robolo.roboloapp.services.EstimationService;
 import com.ksm.robolo.roboloapp.services.ProjectService;
 import com.ksm.robolo.roboloapp.services.UserService;
+import com.ksm.robolo.roboloapp.services.exceptions.ExceptionUnwrapper;
+import com.ksm.robolo.roboloapp.services.exceptions.ProjectServiceException;
 import com.ksm.robolo.roboloapp.services.util.impl.ProjectEntityToStubConverter;
 import com.ksm.robolo.roboloapp.services.util.impl.ProjectEntityToTOConverter;
 import com.ksm.robolo.roboloapp.services.util.impl.TaskToTOConverter;
@@ -20,6 +23,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.util.Assert;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.UUID;
@@ -37,9 +41,18 @@ public class ProjectServiceImpl implements ProjectService {
     private TaskToTOConverter taskToTOConverter;
     private EstimationService estimationService;
     private UserService userService;
+    private UserRepository userRepository;
+    private ExceptionUnwrapper exceptionUnwrapper;
     
     @Autowired
-    public ProjectServiceImpl(ProjectRepository projectRepository, TaskRepository taskRepository, UserService userService, EstimationService estimationService) {
+    public ProjectServiceImpl(
+    		ProjectRepository projectRepository,
+    		TaskRepository taskRepository,
+    		UserService userService,
+    		EstimationService estimationService,
+    		UserRepository userRepository,
+    		ExceptionUnwrapper exceptionUnwrapper
+    		) {
         this.projectRepository = projectRepository;
         this.taskRepository = taskRepository;
         this.userService = userService;
@@ -47,6 +60,8 @@ public class ProjectServiceImpl implements ProjectService {
         this.projectEntityToStubConverter = new ProjectEntityToStubConverter();
         this.taskToTOConverter = new TaskToTOConverter();
         this.estimationService = estimationService;
+        this.userRepository = userRepository;
+        this.exceptionUnwrapper = exceptionUnwrapper;
     }
 
 
@@ -114,4 +129,64 @@ public class ProjectServiceImpl implements ProjectService {
         }
         return projectTO;
     }
+
+
+	@Override
+	public void addProject(String username, ProjectTO projectTO) throws ProjectServiceException {
+		
+		try {
+			Assert.notNull(projectTO, "Project cannot be empty!");
+			
+			AddressEntity address = getAddressEntity(projectTO);
+			Date startDate = getStartDate(projectTO);
+			String projectName = getProjectName(projectTO);
+			UserEntity user = getUser(username);
+			
+			ProjectEntity project = new ProjectEntity();
+			project.setAddress(address);
+			project.setStartDate(startDate);
+			project.setProjectName(projectName);
+			project.setUserEntity(user);
+			
+			projectRepository.save(project);
+		} catch (Exception e) {
+			String errorMessage = exceptionUnwrapper.getExceptionMessage(e);
+			throw new ProjectServiceException(errorMessage);
+		}
+	}
+
+	private UserEntity getUser(String username) {
+		String errorMsg = "Unexpected error - no logged in user!";
+		Assert.notNull(username, errorMsg);
+		UserEntity user = userRepository.findByUsername(username);
+		Assert.notNull(user, errorMsg);
+		return user;
+	}
+
+
+	private String getProjectName(ProjectTO projectTO) {
+		String projectName = projectTO.getProjectName();
+		final String errorMsg = "Project's name cannot be empty!";
+		Assert.notNull(projectName, errorMsg);
+		Assert.isTrue(projectName.length() > 0, errorMsg);
+		return projectName;
+	}
+
+
+	private Date getStartDate(ProjectTO projectTO) {
+		Date startDate = projectTO.getStartDate();
+		final String errorMsg = "Project's start date cannot be empty!";
+		Assert.notNull(startDate, errorMsg);
+		return startDate;
+	}
+
+	private AddressEntity getAddressEntity(ProjectTO projectTO) {
+		AddressEntity address = projectTO.getAddress();
+		final String errorMsg = "Address cannot be empty!";
+		Assert.notNull(address, errorMsg);
+		return address;
+	}
+
+
+	
 }

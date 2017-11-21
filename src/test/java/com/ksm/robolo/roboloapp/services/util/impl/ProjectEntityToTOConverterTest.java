@@ -98,7 +98,7 @@ public class ProjectEntityToTOConverterTest {
         assertEquals(id, projectTO.getId());
         assertEquals(projectName, projectTO.getProjectName());
         assertEquals(startDate, projectTO.getStartDate());
-        assertEquals(addressEntity, projectTO.getAddressTO());
+        assertEquals(addressEntity, projectTO.getAddress());
         assertEquals(clientEntity.getName(), projectTO.getClientTO().getName());
         assertEquals(workers.get(0).getName(), projectTO.getWorkerTOS().get(0).getName());
         assertTrue(projectTO.getTaskTOS().isEmpty());

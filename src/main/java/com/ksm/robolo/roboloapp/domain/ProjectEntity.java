@@ -29,7 +29,6 @@ public class ProjectEntity {
 	@OneToOne
 	private AddressEntity address;
 
-	@NotNull
 	@ManyToOne
 	private ClientEntity client;
 	
