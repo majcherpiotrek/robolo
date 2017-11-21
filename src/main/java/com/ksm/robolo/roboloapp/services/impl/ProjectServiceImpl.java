@@ -3,6 +3,7 @@ package com.ksm.robolo.roboloapp.services.impl;
 import com.ksm.robolo.roboloapp.domain.AddressEntity;
 import com.ksm.robolo.roboloapp.domain.ProjectEntity;
 import com.ksm.robolo.roboloapp.domain.UserEntity;
+import com.ksm.robolo.roboloapp.repository.AddressRepository;
 import com.ksm.robolo.roboloapp.repository.ProjectRepository;
 import com.ksm.robolo.roboloapp.repository.TaskRepository;
 import com.ksm.robolo.roboloapp.repository.UserRepository;
@@ -35,6 +36,7 @@ public class ProjectServiceImpl implements ProjectService {
 
 
     private ProjectRepository projectRepository;
+    private AddressRepository addressRepository;
     private TaskRepository taskRepository;
     private ProjectEntityToTOConverter projectEntityToTOConverter;
     private ProjectEntityToStubConverter projectEntityToStubConverter;
@@ -47,6 +49,7 @@ public class ProjectServiceImpl implements ProjectService {
     @Autowired
     public ProjectServiceImpl(
     		ProjectRepository projectRepository,
+    		AddressRepository addressRepository,
     		TaskRepository taskRepository,
     		UserService userService,
     		EstimationService estimationService,
@@ -54,6 +57,7 @@ public class ProjectServiceImpl implements ProjectService {
     		ExceptionUnwrapper exceptionUnwrapper
     		) {
         this.projectRepository = projectRepository;
+        this.addressRepository = addressRepository;
         this.taskRepository = taskRepository;
         this.userService = userService;
         this.projectEntityToTOConverter = new ProjectEntityToTOConverter();
@@ -148,6 +152,7 @@ public class ProjectServiceImpl implements ProjectService {
 			project.setProjectName(projectName);
 			project.setUserEntity(user);
 			
+			addressRepository.save(project.getAddress());
 			projectRepository.save(project);
 		} catch (Exception e) {
 			String errorMessage = exceptionUnwrapper.getExceptionMessage(e);
