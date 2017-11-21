@@ -37,7 +37,7 @@ public class ProjectController {
     }
 
 
-    @GetMapping(path = "/stubs/all")
+    @GetMapping(path = "/stubs/all", consumes = "application/json")
     public ResponseEntity<Iterable<ProjectStubTO>> getAllProjectStubs(Principal principal) {
         final Iterable<ProjectStubTO> allProjectsStubs = projectService.getAllProjectsStubs(principal.getName());
         return allProjectsStubs == null ?
