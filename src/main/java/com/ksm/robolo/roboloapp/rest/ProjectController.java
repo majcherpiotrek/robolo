@@ -70,7 +70,7 @@ public class ProjectController {
                 new ResponseEntity<>(fromClientList, HttpStatus.OK);
     }
     
-    @PostMapping("/projects/add")
+    @PostMapping("/add")
     public ResponseEntity<String> addProject(@RequestBody ProjectTO projectTO, Principal principal) {
     	try {
 			projectService.addProject(principal.getName(), projectTO);
