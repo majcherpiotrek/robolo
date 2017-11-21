@@ -7,6 +7,7 @@ import com.ksm.robolo.roboloapp.tos.ProjectTO;
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -37,7 +38,7 @@ public class ProjectController {
     }
 
 
-    @GetMapping(path = "/stubs/all", consumes = "application/json")
+    @GetMapping(path = "/stubs/all", consumes = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<Iterable<ProjectStubTO>> getAllProjectStubs(Principal principal) {
         final Iterable<ProjectStubTO> allProjectsStubs = projectService.getAllProjectsStubs(principal.getName());
         return allProjectsStubs == null ?
