@@ -33,10 +33,12 @@ public class ProjectEntityToTOConverter implements EntityToTOConverter<ProjectTO
         projectTO.setProjectName(entity.getProjectName());
         projectTO.setStartDate(entity.getStartDate());
         projectTO.setAddress(entity.getAddress());
-
-        ClientTO clientTO = clientConverter.convertToTO(entity.getClient());
-        projectTO.setClientTO(clientTO);
-
+        
+        if (entity.getClient() != null) {
+        	ClientTO clientTO = clientConverter.convertToTO(entity.getClient());
+            projectTO.setClientTO(clientTO);
+        }
+        
         projectTO.setWorkerTOS(getWorkerTOsFromProjectEntity(entity));
         projectTO.setTaskTOS(new LinkedList<>());
 

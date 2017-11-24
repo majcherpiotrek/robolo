@@ -18,9 +18,11 @@ public class ProjectEntityToStubConverter implements EntityToTOConverter<Project
         stub.setId(entity.getId());
         stub.setProjectName(entity.getProjectName());
         stub.setStartDate(entity.getStartDate());
-        stub.setAddressTO(entity.getAddress());
-        final ClientTO clientTO = new ClientToTOConverter().convertToTO(entity.getClient());
-        stub.setClientTO(clientTO);
+        stub.setAddress(entity.getAddress());
+        if (entity.getClient() != null) {
+        	final ClientTO clientTO = new ClientToTOConverter().convertToTO(entity.getClient());
+        	stub.setClientTO(clientTO);
+        }
         return stub;
     }
 

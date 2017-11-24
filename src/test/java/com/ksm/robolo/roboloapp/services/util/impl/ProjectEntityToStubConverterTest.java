@@ -63,7 +63,7 @@ public class ProjectEntityToStubConverterTest {
 
         final ProjectStubTO projectStubTO = new ProjectEntityToStubConverter().convertToTO(projectEntity);
 
-        assertEquals(addressEntity,projectStubTO.getAddressTO());
+        assertEquals(addressEntity,projectStubTO.getAddress());
         assertEquals(clientTO,projectStubTO.getClientTO());
         assertEquals(projectEntity.getProjectName(),projectStubTO.getProjectName());
         assertEquals(projectEntity.getStartDate(),projectStubTO.getStartDate());

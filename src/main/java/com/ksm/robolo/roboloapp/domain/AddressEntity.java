@@ -21,7 +21,6 @@ public class AddressEntity {
 	@NotNull
 	private String houseNumber;
 
-	@NotNull
 	private String apartmentNumber;
 
 	@NotNull
