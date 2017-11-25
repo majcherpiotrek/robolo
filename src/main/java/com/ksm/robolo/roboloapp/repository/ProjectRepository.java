@@ -14,4 +14,6 @@ public interface ProjectRepository extends CrudRepository<ProjectEntity, Long> {
     List<ProjectEntity> findAllByUserEntityId(UUID userEntityId);
 
     List<ProjectEntity> findAllByUserEntityIdAndClientId(UUID userEntityId, Long clientId);
+    
+    ProjectEntity findById(Long id);
 }

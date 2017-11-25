@@ -22,6 +22,7 @@ public class ProjectController {
 
     private static final Logger logger = Logger.getLogger(ProjectController.class);
     private static final String PROJECT_ADDED_MSG = "New project has been created";
+    private static final String PROJECT_UPDATED_MSG = "Project has been updated";
     
     private ProjectService projectService;
 
@@ -32,19 +33,16 @@ public class ProjectController {
 
 
     @GetMapping(path = "/all")
-    public ResponseEntity<Iterable<ProjectTO>> getAllProjects(Principal principal) {
-        Iterable<ProjectTO> projectTOS = projectService.getAllProjects(principal.getName());
-        return projectTOS == null ? new ResponseEntity<>(HttpStatus.NOT_FOUND) : new ResponseEntity<>(projectTOS, HttpStatus.OK);
+    public ResponseEntity<List<ProjectTO>> getAllProjects(Principal principal) {
+        List<ProjectTO> projectTOS = projectService.getAllProjects(principal.getName());
+        return new ResponseEntity<>(projectTOS, HttpStatus.OK);
     }
 
 
     @GetMapping(path = "/stubs/all", consumes = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<Iterable<ProjectStubTO>> getAllProjectStubs(Principal principal) {
-        final Iterable<ProjectStubTO> allProjectsStubs = projectService.getAllProjectsStubs(principal.getName());
-        return allProjectsStubs == null ?
-                new ResponseEntity<Iterable<ProjectStubTO>>(HttpStatus.NOT_FOUND)
-                : new ResponseEntity<>(allProjectsStubs, HttpStatus.OK);
-
+    public ResponseEntity<List<ProjectStubTO>> getAllProjectStubs(Principal principal) {
+        final List<ProjectStubTO> allProjectsStubs = projectService.getAllProjectsStubs(principal.getName());
+        return new ResponseEntity<>(allProjectsStubs, HttpStatus.OK);
     }
 
     @GetMapping(path = "/{projectId}")
@@ -60,25 +58,40 @@ public class ProjectController {
 
 
     @GetMapping(path = "/byclient/{clientId}")
-    public ResponseEntity<Iterable<ProjectStubTO>> getAllProjectsStubForClientId(@PathVariable String clientId, Principal principal) {
+    public ResponseEntity<List<ProjectStubTO>> getAllProjectsStubForClientId(@PathVariable String clientId, Principal principal) {
     	List<ProjectStubTO> fromClientList = null;
         Long clientIdLong = Long.valueOf(clientId);
         fromClientList = projectService.getAllProjectStubsFromClient(principal.getName(), clientIdLong);
 
-        return fromClientList == null ?
-                new ResponseEntity<>(HttpStatus.NOT_FOUND) :
-                new ResponseEntity<>(fromClientList, HttpStatus.OK);
+        return new ResponseEntity<>(fromClientList, HttpStatus.OK);
+    }
+    
+    @PostMapping("/edit/{projectId}")
+    public ResponseEntity<List<ProjectStubTO>> editProject(@PathVariable Long projectId, @RequestBody ProjectTO projectTO, Principal principal) {
+		try {
+			projectService.editProject(projectId, projectTO);
+			
+	    	logger.info(PROJECT_UPDATED_MSG);
+		} catch (ProjectServiceException e) {
+			return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+		}
+		
+		final List<ProjectStubTO> allProjectsStubs = projectService.getAllProjectsStubs(principal.getName());
+        return new ResponseEntity<>(allProjectsStubs, HttpStatus.OK);
     }
     
     @PostMapping("/add")
-    public ResponseEntity<String> addProject(@RequestBody ProjectTO projectTO, Principal principal) {
+    public ResponseEntity<List<ProjectStubTO>> addProject(@RequestBody ProjectTO projectTO, Principal principal) {
+    	String username = principal.getName();
     	try {
-			projectService.addProject(principal.getName(), projectTO);
+			projectService.addProject(username, projectTO);
+			
+	    	logger.info(PROJECT_ADDED_MSG);
 		} catch (ProjectServiceException e) {
-			return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
+			return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
 		}
-    	
-    	return new ResponseEntity<>(PROJECT_ADDED_MSG, HttpStatus.OK);
+    	final List<ProjectStubTO> allProjectsStubs = projectService.getAllProjectsStubs(username);
+        return new ResponseEntity<>(allProjectsStubs, HttpStatus.OK);
     }
 
 }

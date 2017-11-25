@@ -158,6 +158,40 @@ public class ProjectServiceImpl implements ProjectService {
 			String errorMessage = exceptionUnwrapper.getExceptionMessage(e);
 			throw new ProjectServiceException(errorMessage);
 		}
+	}	
+	
+	@Override
+	public void editProject(Long projectId, ProjectTO projectTO) throws ProjectServiceException {
+		ProjectEntity projectEntity = projectRepository.findById(projectId);
+		
+		if (projectEntity == null) {
+			throw new ProjectServiceException("Project not found");
+		}
+		
+		try {
+			
+			AddressEntity addressFromTO = projectTO.getAddress();
+			if (addressFromTO != null) {
+				AddressEntity address = addressRepository.findOne(projectTO.getAddress().getId());
+				address.setStreet(addressFromTO.getStreet());
+				address.setHouseNumber(addressFromTO.getHouseNumber());
+				address.setApartmentNumber(addressFromTO.getApartmentNumber());
+				address.setPostCode(addressFromTO.getPostCode());
+				address.setCity(addressFromTO.getCity());
+				address.setCountry(addressFromTO.getCountry());
+				addressRepository.save(address);
+				projectEntity.setAddress(address);
+			}
+			
+			Date startDate = getStartDate(projectTO);
+			String projectName = getProjectName(projectTO);
+			projectEntity.setStartDate(startDate);
+			projectEntity.setProjectName(projectName);
+			
+			projectRepository.save(projectEntity);
+		} catch (Exception e) {
+			throw new ProjectServiceException(e.getMessage());
+		}
 	}
 
 	private UserEntity getUser(String username) {
@@ -191,7 +225,4 @@ public class ProjectServiceImpl implements ProjectService {
 		Assert.notNull(address, errorMsg);
 		return address;
 	}
-
-
-	
 }

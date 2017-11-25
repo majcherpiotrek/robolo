@@ -17,4 +17,6 @@ public interface ProjectService {
     ProjectTO getProject(String username, Long projectId);
 
 	void addProject(String username, ProjectTO projectTO) throws ProjectServiceException;
+
+	void editProject(Long projectId, ProjectTO projectTO) throws ProjectServiceException;
 }
