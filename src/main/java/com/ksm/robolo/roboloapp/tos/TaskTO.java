@@ -1,5 +1,6 @@
 package com.ksm.robolo.roboloapp.tos;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import com.ksm.robolo.roboloapp.domain.TaskItemEntity;
 import com.ksm.robolo.roboloapp.enums.TaskStatus;
 
@@ -15,9 +16,11 @@ public class TaskTO {
     private Integer estimatedTaskDuration;
 
     private List<WorkerTO> workers;
-
+    
+    @JsonFormat(pattern="yyyy-MM-dd")
     private Date creationDate;
-
+    
+    @JsonFormat(pattern="yyyy-MM-dd")
     private Date startDate;
 
     private TaskStatus status;

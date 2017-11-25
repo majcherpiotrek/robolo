@@ -2,6 +2,7 @@ package com.ksm.robolo.roboloapp.rest;
 
 import com.ksm.robolo.roboloapp.services.ProjectService;
 import com.ksm.robolo.roboloapp.services.exceptions.ProjectServiceException;
+import com.ksm.robolo.roboloapp.tos.ClientTO;
 import com.ksm.robolo.roboloapp.tos.ProjectStubTO;
 import com.ksm.robolo.roboloapp.tos.ProjectTO;
 import org.apache.log4j.Logger;
@@ -80,6 +81,16 @@ public class ProjectController {
         return new ResponseEntity<>(allProjectsStubs, HttpStatus.OK);
     }
     
+    @PostMapping("/update-client/{projectId}")
+    public ResponseEntity<ProjectTO> updateClientInProject(@PathVariable Long projectId, @RequestBody ClientTO clientTO, Principal principal) {
+    	try {
+    		projectService.updateClient(projectId, clientTO);
+    	} catch (ProjectServiceException e) {
+    		return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+    	}
+    	
+    	return new ResponseEntity<ProjectTO>(projectService.getProject(principal.getName(), projectId), HttpStatus.OK);
+    }
     @PostMapping("/add")
     public ResponseEntity<List<ProjectStubTO>> addProject(@RequestBody ProjectTO projectTO, Principal principal) {
     	String username = principal.getName();

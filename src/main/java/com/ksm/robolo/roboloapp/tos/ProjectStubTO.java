@@ -1,5 +1,6 @@
 package com.ksm.robolo.roboloapp.tos;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import com.ksm.robolo.roboloapp.domain.AddressEntity;
 
 import java.util.Date;
@@ -9,7 +10,8 @@ public class ProjectStubTO {
     private Long id;
 
     private String projectName;
-
+    
+    @JsonFormat(pattern="yyyy-MM-dd")
     private Date startDate;
 
     private AddressEntity address;

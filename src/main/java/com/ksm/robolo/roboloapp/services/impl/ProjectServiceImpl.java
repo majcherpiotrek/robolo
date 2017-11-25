@@ -15,6 +15,7 @@ import com.ksm.robolo.roboloapp.services.exceptions.ProjectServiceException;
 import com.ksm.robolo.roboloapp.services.util.impl.ProjectEntityToStubConverter;
 import com.ksm.robolo.roboloapp.services.util.impl.ProjectEntityToTOConverter;
 import com.ksm.robolo.roboloapp.services.util.impl.TaskToTOConverter;
+import com.ksm.robolo.roboloapp.tos.ClientTO;
 import com.ksm.robolo.roboloapp.tos.ProjectStubTO;
 import com.ksm.robolo.roboloapp.tos.ProjectTO;
 import com.ksm.robolo.roboloapp.tos.TaskTO;
@@ -152,8 +153,8 @@ public class ProjectServiceImpl implements ProjectService {
 			project.setProjectName(projectName);
 			project.setUserEntity(user);
 			
-			addressRepository.save(project.getAddress());
-			projectRepository.save(project);
+			addressRepository.saveAndFlush(project.getAddress());
+			projectRepository.saveAndFlush(project);
 		} catch (Exception e) {
 			String errorMessage = exceptionUnwrapper.getExceptionMessage(e);
 			throw new ProjectServiceException(errorMessage);
@@ -179,7 +180,7 @@ public class ProjectServiceImpl implements ProjectService {
 				address.setPostCode(addressFromTO.getPostCode());
 				address.setCity(addressFromTO.getCity());
 				address.setCountry(addressFromTO.getCountry());
-				addressRepository.save(address);
+				addressRepository.saveAndFlush(address);
 				projectEntity.setAddress(address);
 			}
 			
@@ -188,10 +189,16 @@ public class ProjectServiceImpl implements ProjectService {
 			projectEntity.setStartDate(startDate);
 			projectEntity.setProjectName(projectName);
 			
-			projectRepository.save(projectEntity);
+			projectRepository.saveAndFlush(projectEntity);
 		} catch (Exception e) {
 			throw new ProjectServiceException(e.getMessage());
 		}
+	}
+	
+	@Override
+	public void updateClient(Long projectId, ClientTO clientTO) throws ProjectServiceException {
+		// TODO Auto-generated method stub
+		
 	}
 
 	private UserEntity getUser(String username) {
