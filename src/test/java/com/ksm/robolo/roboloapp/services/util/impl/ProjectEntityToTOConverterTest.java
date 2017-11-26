@@ -75,7 +75,7 @@ public class ProjectEntityToTOConverterTest {
         taskEntity.setCreationDate(startDate);
         taskEntity.setStatus(TaskStatus.IN_PROGRESS);
         int estimatedTaskDuration = 1;
-        taskEntity.setEstimatedTaskDuration(estimatedTaskDuration);
+        taskEntity.setEstimatedTaskDurationHours(estimatedTaskDuration);
         taskEntity.setProject(projectEntity);
         taskEntity.setWorkers(workers);
 

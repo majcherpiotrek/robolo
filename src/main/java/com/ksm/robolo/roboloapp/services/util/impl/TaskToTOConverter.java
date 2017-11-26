@@ -6,17 +6,22 @@ import com.ksm.robolo.roboloapp.domain.WorkerEntity;
 import com.ksm.robolo.roboloapp.services.util.EntityToTOConverter;
 import com.ksm.robolo.roboloapp.tos.TaskTO;
 import com.ksm.robolo.roboloapp.tos.WorkerTO;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 import org.springframework.util.Assert;
 
 import java.util.LinkedList;
 import java.util.List;
 
+@Component
 public class TaskToTOConverter implements EntityToTOConverter<TaskTO, TaskEntity>{
 
     private WorkerToTOConverter workerConverter;
 
-    public TaskToTOConverter() {
-        workerConverter = new WorkerToTOConverter();
+    @Autowired
+    public TaskToTOConverter(WorkerToTOConverter workerConverter) {
+        this.workerConverter = workerConverter;
     }
     @Override
     public TaskTO convertToTO(TaskEntity entity) {
@@ -24,7 +29,7 @@ public class TaskToTOConverter implements EntityToTOConverter<TaskTO, TaskEntity
         taskTO.setId(entity.getId());
         taskTO.setCreationDate(entity.getCreationDate());
         taskTO.setDescription(entity.getDescription());
-        taskTO.setEstimatedTaskDuration(entity.getEstimatedTaskDuration());
+        taskTO.setEstimatedTaskDurationHours(entity.getEstimatedTaskDurationHours());
         taskTO.setStartDate(entity.getStartDate());
         taskTO.setStatus(entity.getStatus());
 

@@ -13,7 +13,7 @@ public class TaskTO {
 
     private String description;
 
-    private Integer estimatedTaskDuration;
+    private Integer estimatedTaskDurationHours;
 
     private List<WorkerTO> workers;
     
@@ -43,12 +43,12 @@ public class TaskTO {
         this.description = description;
     }
 
-    public Integer getEstimatedTaskDuration() {
-        return estimatedTaskDuration;
+    public Integer getEstimatedTaskDurationHours() {
+        return estimatedTaskDurationHours;
     }
 
-    public void setEstimatedTaskDuration(Integer estimatedTaskDuration) {
-        this.estimatedTaskDuration = estimatedTaskDuration;
+    public void setEstimatedTaskDurationHours(Integer estimatedTaskDurationHours) {
+        this.estimatedTaskDurationHours = estimatedTaskDurationHours;
     }
 
     public List<WorkerTO> getWorkers() {

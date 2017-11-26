@@ -6,5 +6,7 @@ import org.springframework.data.repository.CrudRepository;
 import com.ksm.robolo.roboloapp.domain.AddressEntity;
 
 public interface AddressRepository extends JpaRepository<AddressEntity, Long> {
+	
+	AddressEntity findById(Long id);
 
 }

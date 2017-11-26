@@ -1,11 +1,10 @@
 package com.ksm.robolo.roboloapp.services;
 
+import java.util.List;
+
 import com.ksm.robolo.roboloapp.services.exceptions.ProjectServiceException;
-import com.ksm.robolo.roboloapp.tos.ClientTO;
 import com.ksm.robolo.roboloapp.tos.ProjectStubTO;
 import com.ksm.robolo.roboloapp.tos.ProjectTO;
-
-import java.util.List;
 
 public interface ProjectService {
 
@@ -21,5 +20,7 @@ public interface ProjectService {
 
 	void editProject(Long projectId, ProjectTO projectTO) throws ProjectServiceException;
 
-	void updateClient(Long projectId, ClientTO clientTO) throws ProjectServiceException;
+	void updateClient(Long projectId, Long clientId) throws ProjectServiceException;
+	
+	void deleteProject(Long projectId);
 }

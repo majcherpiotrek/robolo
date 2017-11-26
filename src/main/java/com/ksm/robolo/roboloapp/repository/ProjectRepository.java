@@ -9,6 +9,8 @@ import org.springframework.data.repository.CrudRepository;
 import java.util.List;
 import java.util.UUID;
 
+import javax.transaction.Transactional;
+
 
 public interface ProjectRepository extends JpaRepository<ProjectEntity, Long> {
 
@@ -17,4 +19,7 @@ public interface ProjectRepository extends JpaRepository<ProjectEntity, Long> {
     List<ProjectEntity> findAllByUserEntityIdAndClientId(UUID userEntityId, Long clientId);
     
     ProjectEntity findById(Long id);
+    
+    @Transactional
+    void deleteById(Long id);
 }

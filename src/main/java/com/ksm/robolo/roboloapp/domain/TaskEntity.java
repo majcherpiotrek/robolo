@@ -19,12 +19,12 @@ public class TaskEntity {
 	@ManyToOne(targetEntity = UserEntity.class)
     @NotNull
 	private UserEntity userEntity;
-
+	
 	@NotNull
 	private String description;
 
 	@NotNull
-	private Integer estimatedTaskDuration;
+	private Integer estimatedTaskDurationHours;
 
 	@NotNull
 	@ManyToOne
@@ -38,7 +38,6 @@ public class TaskEntity {
 	@Temporal(TemporalType.DATE)
 	private Date creationDate;
 
-	@NotNull
 	@Temporal(TemporalType.DATE)
 	private Date startDate;
 
@@ -73,12 +72,12 @@ public class TaskEntity {
 		this.description = description;
 	}
 
-	public Integer getEstimatedTaskDuration() {
-		return estimatedTaskDuration;
+	public Integer getEstimatedTaskDurationHours() {
+		return estimatedTaskDurationHours;
 	}
 
-	public void setEstimatedTaskDuration(Integer estimatedTaskDuration) {
-		this.estimatedTaskDuration = estimatedTaskDuration;
+	public void setEstimatedTaskDurationHours(Integer estimatedTaskDurationHours) {
+		this.estimatedTaskDurationHours = estimatedTaskDurationHours;
 	}
 
 	public ProjectEntity getProject() {
@@ -138,7 +137,7 @@ public class TaskEntity {
 
         if(!getUserEntity().equals(that.getUserEntity())) return false;
 		if (!getDescription().equals(that.getDescription())) return false;
-		if (getEstimatedTaskDuration() != null ? !getEstimatedTaskDuration().equals(that.getEstimatedTaskDuration()) : that.getEstimatedTaskDuration() != null)
+		if (getEstimatedTaskDurationHours() != null ? !getEstimatedTaskDurationHours().equals(that.getEstimatedTaskDurationHours()) : that.getEstimatedTaskDurationHours() != null)
 			return false;
 		if (!getProject().equals(that.getProject())) return false;
 		if (!getWorkers().equals(that.getWorkers())) return false;
@@ -152,7 +151,7 @@ public class TaskEntity {
 	public int hashCode() {
 		int result = getDescription().hashCode();
         result = 31 * result + getUserEntity().hashCode();
-		result = 31 * result + (getEstimatedTaskDuration() != null ? getEstimatedTaskDuration().hashCode() : 0);
+		result = 31 * result + (getEstimatedTaskDurationHours() != null ? getEstimatedTaskDurationHours().hashCode() : 0);
 		result = 31 * result + getProject().hashCode();
 		result = 31 * result + getWorkers().hashCode();
 		result = 31 * result + getCreationDate().hashCode();

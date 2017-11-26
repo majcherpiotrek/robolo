@@ -28,7 +28,7 @@ public class EstimationServiceImpl implements EstimationService{
         Long projectDuration = 0L;
         for (TaskTO taskTO : projectTO.getTaskTOS()) {
             if (!TaskStatus.DONE.equals(taskTO.getStatus())) {
-                projectDuration += taskTO.getEstimatedTaskDuration() * DAY_IN_MILIS;
+                projectDuration += taskTO.getEstimatedTaskDurationHours() * DAY_IN_MILIS;
             }
         }
         approximateEndDate.setTime(approximateEndDate.getTime() + projectDuration);

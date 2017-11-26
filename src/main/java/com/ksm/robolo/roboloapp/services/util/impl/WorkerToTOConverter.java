@@ -3,11 +3,14 @@ package com.ksm.robolo.roboloapp.services.util.impl;
 import com.ksm.robolo.roboloapp.domain.WorkerEntity;
 import com.ksm.robolo.roboloapp.services.util.EntityToTOConverter;
 import com.ksm.robolo.roboloapp.tos.WorkerTO;
+
+import org.springframework.stereotype.Component;
 import org.springframework.util.Assert;
 
 import java.util.ArrayList;
 import java.util.List;
 
+@Component
 public class WorkerToTOConverter implements EntityToTOConverter<WorkerTO, WorkerEntity> {
 
     @Override

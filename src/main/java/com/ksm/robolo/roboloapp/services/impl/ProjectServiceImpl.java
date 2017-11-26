@@ -1,9 +1,13 @@
 package com.ksm.robolo.roboloapp.services.impl;
 
 import com.ksm.robolo.roboloapp.domain.AddressEntity;
+import com.ksm.robolo.roboloapp.domain.ClientEntity;
 import com.ksm.robolo.roboloapp.domain.ProjectEntity;
+import com.ksm.robolo.roboloapp.domain.TaskEntity;
 import com.ksm.robolo.roboloapp.domain.UserEntity;
+import com.ksm.robolo.roboloapp.enums.TaskStatus;
 import com.ksm.robolo.roboloapp.repository.AddressRepository;
+import com.ksm.robolo.roboloapp.repository.ClientRepository;
 import com.ksm.robolo.roboloapp.repository.ProjectRepository;
 import com.ksm.robolo.roboloapp.repository.TaskRepository;
 import com.ksm.robolo.roboloapp.repository.UserRepository;
@@ -39,6 +43,7 @@ public class ProjectServiceImpl implements ProjectService {
     private ProjectRepository projectRepository;
     private AddressRepository addressRepository;
     private TaskRepository taskRepository;
+    private ClientRepository clientRepository;
     private ProjectEntityToTOConverter projectEntityToTOConverter;
     private ProjectEntityToStubConverter projectEntityToStubConverter;
     private TaskToTOConverter taskToTOConverter;
@@ -55,7 +60,9 @@ public class ProjectServiceImpl implements ProjectService {
     		UserService userService,
     		EstimationService estimationService,
     		UserRepository userRepository,
-    		ExceptionUnwrapper exceptionUnwrapper
+    		ExceptionUnwrapper exceptionUnwrapper,
+    		ClientRepository clientRepository,
+    		TaskToTOConverter taskToTOConverter
     		) {
         this.projectRepository = projectRepository;
         this.addressRepository = addressRepository;
@@ -63,10 +70,11 @@ public class ProjectServiceImpl implements ProjectService {
         this.userService = userService;
         this.projectEntityToTOConverter = new ProjectEntityToTOConverter();
         this.projectEntityToStubConverter = new ProjectEntityToStubConverter();
-        this.taskToTOConverter = new TaskToTOConverter();
+        this.taskToTOConverter = taskToTOConverter;
         this.estimationService = estimationService;
         this.userRepository = userRepository;
         this.exceptionUnwrapper = exceptionUnwrapper;
+        this.clientRepository = clientRepository;
     }
 
 
@@ -173,7 +181,7 @@ public class ProjectServiceImpl implements ProjectService {
 			
 			AddressEntity addressFromTO = projectTO.getAddress();
 			if (addressFromTO != null) {
-				AddressEntity address = addressRepository.findOne(projectTO.getAddress().getId());
+				AddressEntity address = addressRepository.findById(projectEntity.getAddress().getId());
 				address.setStreet(addressFromTO.getStreet());
 				address.setHouseNumber(addressFromTO.getHouseNumber());
 				address.setApartmentNumber(addressFromTO.getApartmentNumber());
@@ -191,16 +199,38 @@ public class ProjectServiceImpl implements ProjectService {
 			
 			projectRepository.saveAndFlush(projectEntity);
 		} catch (Exception e) {
-			throw new ProjectServiceException(e.getMessage());
+			String errorMessage = exceptionUnwrapper.getExceptionMessage(e);
+			throw new ProjectServiceException(errorMessage);
 		}
 	}
 	
 	@Override
-	public void updateClient(Long projectId, ClientTO clientTO) throws ProjectServiceException {
-		// TODO Auto-generated method stub
+	public void updateClient(Long projectId, Long clientId) throws ProjectServiceException {
+		ProjectEntity projectEntity = projectRepository.findById(projectId);
+		if (projectEntity == null) {
+			throw new ProjectServiceException("Project not found!");
+		}
 		
+		ClientEntity client = clientRepository.findById(clientId);
+		
+		if (client == null) {
+			throw new ProjectServiceException("Client not found!");
+		}
+		
+		projectEntity.setClient(client);
+		
+		projectRepository.saveAndFlush(projectEntity);
 	}
-
+	
+	@Override
+	public void deleteProject(Long projectId) {
+		ProjectEntity project = projectRepository.findById(projectId);
+		if (project != null) {
+			taskRepository.deleteByProject(project);
+			projectRepository.deleteById(projectId);
+		}
+	}
+	
 	private UserEntity getUser(String username) {
 		String errorMsg = "Unexpected error - no logged in user!";
 		Assert.notNull(username, errorMsg);

@@ -41,15 +41,15 @@ public class EstimationServiceImplTest {
         projectTO.setStartDate(beginningDate);
 
         TaskTO task1 = new TaskTO();
-        task1.setEstimatedTaskDuration(firstTaskDuration);
+        task1.setEstimatedTaskDurationHours(firstTaskDuration);
         task1.setStatus(TaskStatus.IN_PROGRESS);
 
         TaskTO task2 = new TaskTO();
-        task2.setEstimatedTaskDuration(secondTaskDuration);
+        task2.setEstimatedTaskDurationHours(secondTaskDuration);
         task2.setStatus(TaskStatus.TO_DO);
 
         TaskTO task3 = new TaskTO();
-        task3.setEstimatedTaskDuration(secondTaskDuration);
+        task3.setEstimatedTaskDurationHours(secondTaskDuration);
         task3.setStatus(TaskStatus.DONE);
 
         List<TaskTO> taskTOList = new LinkedList<>();

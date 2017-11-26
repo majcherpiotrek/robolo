@@ -5,6 +5,8 @@ import com.ksm.robolo.roboloapp.services.exceptions.ProjectServiceException;
 import com.ksm.robolo.roboloapp.tos.ClientTO;
 import com.ksm.robolo.roboloapp.tos.ProjectStubTO;
 import com.ksm.robolo.roboloapp.tos.ProjectTO;
+import com.ksm.robolo.roboloapp.tos.TaskTO;
+
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -31,8 +33,15 @@ public class ProjectController {
     public ProjectController(ProjectService projectService) {
         this.projectService = projectService;
     }
-
-
+    
+    @DeleteMapping(path = "/delete/{projectId}")
+    public ResponseEntity<List<ProjectStubTO>> deleteProject(@PathVariable Long projectId, Principal principal) {
+    	projectService.deleteProject(projectId);
+		
+    	final List<ProjectStubTO> allProjectsStubs = projectService.getAllProjectsStubs(principal.getName());
+        return new ResponseEntity<>(allProjectsStubs, HttpStatus.OK);
+    }
+    
     @GetMapping(path = "/all")
     public ResponseEntity<List<ProjectTO>> getAllProjects(Principal principal) {
         List<ProjectTO> projectTOS = projectService.getAllProjects(principal.getName());
@@ -67,30 +76,35 @@ public class ProjectController {
         return new ResponseEntity<>(fromClientList, HttpStatus.OK);
     }
     
-    @PostMapping("/edit/{projectId}")
-    public ResponseEntity<List<ProjectStubTO>> editProject(@PathVariable Long projectId, @RequestBody ProjectTO projectTO, Principal principal) {
+    @PostMapping("/update/{projectId}")
+    public ResponseEntity<ProjectTO> editProject(@PathVariable Long projectId, @RequestBody ProjectTO projectTO, Principal principal) {
 		try {
 			projectService.editProject(projectId, projectTO);
 			
 	    	logger.info(PROJECT_UPDATED_MSG);
 		} catch (ProjectServiceException e) {
+			logger.error(e.getMessage());
+			e.printStackTrace();
 			return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
 		}
 		
-		final List<ProjectStubTO> allProjectsStubs = projectService.getAllProjectsStubs(principal.getName());
-        return new ResponseEntity<>(allProjectsStubs, HttpStatus.OK);
+		final ProjectTO updatedProject = projectService.getProject(principal.getName(), projectId);
+        return new ResponseEntity<>(updatedProject, HttpStatus.OK);
     }
     
-    @PostMapping("/update-client/{projectId}")
-    public ResponseEntity<ProjectTO> updateClientInProject(@PathVariable Long projectId, @RequestBody ClientTO clientTO, Principal principal) {
+    @PostMapping("/update-client/{projectId}/{clientId}")
+    public ResponseEntity<ProjectTO> updateClientInProject(@PathVariable Long projectId, @PathVariable Long clientId, Principal principal) {
     	try {
-    		projectService.updateClient(projectId, clientTO);
+    		projectService.updateClient(projectId, clientId);
     	} catch (ProjectServiceException e) {
+    		logger.error(e.getMessage());
+			e.printStackTrace();
     		return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
     	}
     	
     	return new ResponseEntity<ProjectTO>(projectService.getProject(principal.getName(), projectId), HttpStatus.OK);
     }
+    
     @PostMapping("/add")
     public ResponseEntity<List<ProjectStubTO>> addProject(@RequestBody ProjectTO projectTO, Principal principal) {
     	String username = principal.getName();
@@ -99,10 +113,11 @@ public class ProjectController {
 			
 	    	logger.info(PROJECT_ADDED_MSG);
 		} catch (ProjectServiceException e) {
+			logger.error(e.getMessage());
+			e.printStackTrace();
 			return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
 		}
     	final List<ProjectStubTO> allProjectsStubs = projectService.getAllProjectsStubs(username);
         return new ResponseEntity<>(allProjectsStubs, HttpStatus.OK);
     }
-
 }
