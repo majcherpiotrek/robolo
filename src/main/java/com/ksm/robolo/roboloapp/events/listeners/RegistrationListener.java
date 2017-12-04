@@ -1,17 +1,16 @@
 package com.ksm.robolo.roboloapp.events.listeners;
 
+import java.util.UUID;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.ApplicationListener;
+import org.springframework.stereotype.Component;
+
 import com.ksm.robolo.roboloapp.events.OnRegistrationCompleteEvent;
 import com.ksm.robolo.roboloapp.services.EmailService;
 import com.ksm.robolo.roboloapp.services.UserService;
 import com.ksm.robolo.roboloapp.services.exceptions.EmailServiceException;
 import com.ksm.robolo.roboloapp.tos.UserTO;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.ApplicationListener;
-import org.springframework.mail.SimpleMailMessage;
-import org.springframework.mail.javamail.JavaMailSender;
-import org.springframework.stereotype.Component;
-
-import java.util.UUID;
 
 @Component
 public class RegistrationListener implements ApplicationListener<OnRegistrationCompleteEvent> {
