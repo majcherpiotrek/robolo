@@ -1,36 +1,37 @@
 package com.ksm.robolo.roboloapp.services.impl;
 
-import com.ksm.robolo.roboloapp.domain.UserEntity;
-import com.ksm.robolo.roboloapp.domain.VerificationToken;
-import com.ksm.robolo.roboloapp.repository.UserRepository;
-import com.ksm.robolo.roboloapp.repository.VerificationTokenRepository;
-import com.ksm.robolo.roboloapp.services.EmailService;
-import com.ksm.robolo.roboloapp.services.UserService;
-import com.ksm.robolo.roboloapp.services.exceptions.*;
-import com.ksm.robolo.roboloapp.tos.RetrievePasswordTO;
-import com.ksm.robolo.roboloapp.tos.UserTO;
+import static java.util.Collections.emptyList;
+
+import java.util.Date;
+import java.util.UUID;
+
+import javax.transaction.Transactional;
+
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.mail.SimpleMailMessage;
-import org.springframework.security.authentication.AnonymousAuthenticationToken;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.TransactionSystemException;
 import org.springframework.util.Assert;
 
-import javax.transaction.Transactional;
-import javax.validation.ConstraintViolation;
-import javax.validation.ConstraintViolationException;
-import java.util.Set;
-import java.util.Date;
-import java.util.UUID;
-import static java.util.Collections.emptyList;
+import com.ksm.robolo.roboloapp.domain.UserEntity;
+import com.ksm.robolo.roboloapp.domain.VerificationToken;
+import com.ksm.robolo.roboloapp.repository.UserRepository;
+import com.ksm.robolo.roboloapp.repository.VerificationTokenRepository;
+import com.ksm.robolo.roboloapp.services.EmailService;
+import com.ksm.robolo.roboloapp.services.UserService;
+import com.ksm.robolo.roboloapp.services.exceptions.EmailServiceException;
+import com.ksm.robolo.roboloapp.services.exceptions.ExceptionUnwrapper;
+import com.ksm.robolo.roboloapp.services.exceptions.PasswordsNotMatchingException;
+import com.ksm.robolo.roboloapp.services.exceptions.RegistrationException;
+import com.ksm.robolo.roboloapp.services.exceptions.RetrievePasswordException;
+import com.ksm.robolo.roboloapp.services.exceptions.UserEmailConstraintViolationException;
+import com.ksm.robolo.roboloapp.services.exceptions.UsernameConstraintViolationException;
+import com.ksm.robolo.roboloapp.tos.RetrievePasswordTO;
+import com.ksm.robolo.roboloapp.tos.UserTO;
 
 @Service
 public class UserServiceImpl implements UserService, UserDetailsService {
