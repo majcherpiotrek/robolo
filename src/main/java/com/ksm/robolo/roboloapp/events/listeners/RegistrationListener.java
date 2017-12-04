@@ -3,6 +3,7 @@ package com.ksm.robolo.roboloapp.events.listeners;
 import com.ksm.robolo.roboloapp.events.OnRegistrationCompleteEvent;
 import com.ksm.robolo.roboloapp.services.EmailService;
 import com.ksm.robolo.roboloapp.services.UserService;
+import com.ksm.robolo.roboloapp.services.exceptions.EmailServiceException;
 import com.ksm.robolo.roboloapp.tos.UserTO;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationListener;
@@ -37,12 +38,12 @@ public class RegistrationListener implements ApplicationListener<OnRegistrationC
 
         String recipientAddress = user.getEmail();
         String subject = "Robolify - registration confirmation";
+        String content = "Click this link to confirm your account: " + event.getAppUrl() + token;
 
-        SimpleMailMessage email = new SimpleMailMessage();
-        email.setFrom("robolify@gmail.com");
-        email.setTo(recipientAddress);
-        email.setSubject(subject);
-        email.setText("Click this link to confirm your account: " + event.getAppUrl() + token);
-        emailService.sendMail(email);
+        try {
+			emailService.sendMail(recipientAddress, subject, content);
+		} catch (EmailServiceException e) {
+			e.printStackTrace();
+		}
     }
 }

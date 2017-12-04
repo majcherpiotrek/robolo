@@ -1,8 +1,8 @@
 package com.ksm.robolo.roboloapp.services;
 
-import org.springframework.mail.SimpleMailMessage;
+import com.ksm.robolo.roboloapp.services.exceptions.EmailServiceException;
 
 public interface EmailService {
 
-    void sendMail(SimpleMailMessage mailMessage);
+    void sendMail(String recipientAddress, String subject, String content) throws EmailServiceException;
 }

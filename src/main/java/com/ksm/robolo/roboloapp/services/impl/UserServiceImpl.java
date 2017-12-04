@@ -234,13 +234,13 @@ public class UserServiceImpl implements UserService, UserDetailsService {
     private void sendRetrieveTokenEmail(String token, UserEntity user) {
         String recipientAddress = user.getEmail();
         String subject = "Robolify - retrieve password";
+        String content = "Copy this token to change your password: " + token;
 
-        SimpleMailMessage email = new SimpleMailMessage();
-        email.setFrom("robolify@gmail.com");
-        email.setTo(recipientAddress);
-        email.setSubject(subject);
-        email.setText("Copy this token to change your password: " + token);
-        emailService.sendMail(email);
+        try {
+			emailService.sendMail(recipientAddress, subject, content);
+		} catch (EmailServiceException e) {
+			e.printStackTrace();
+		}
     }
     
     private UserEntity findByEmail(String email) {
