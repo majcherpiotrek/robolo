@@ -10,6 +10,7 @@ import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.ApplicationArguments;
 import org.springframework.boot.ApplicationRunner;
+import org.springframework.context.annotation.AnnotationConfigApplicationContext;
 import org.springframework.stereotype.Component;
 
 import com.ksm.robolo.roboloapp.domain.AddressEntity;
@@ -26,7 +27,6 @@ import com.ksm.robolo.roboloapp.repository.UserRepository;
 import com.ksm.robolo.roboloapp.repository.WorkerRepository;
 import com.ksm.robolo.roboloapp.services.UserService;
 import com.ksm.robolo.roboloapp.services.exceptions.RegistrationException;
-import com.ksm.robolo.roboloapp.tos.ClientTO;
 import com.ksm.robolo.roboloapp.tos.UserTO;
 
 @Component
@@ -40,6 +40,7 @@ public class DevelopmentDataLoader implements ApplicationRunner {
 	private AddressRepository addressRepository;
 	private ProjectRepository projectRepository;
 	private WorkerRepository workerRepository;
+	private boolean enabled = false;
 	
 	@Autowired
 	public DevelopmentDataLoader(
@@ -58,6 +59,10 @@ public class DevelopmentDataLoader implements ApplicationRunner {
 		this.addressRepository = addressRepository;
 		this.projectRepository = projectRepository;
 		this.workerRepository = workerRepository;
+		
+		AnnotationConfigApplicationContext ctx= new AnnotationConfigApplicationContext(EnviromentConfig.class);
+		DevelopmentDataLoaderConfigurer config = ctx.getBean(DevelopmentDataLoaderConfigurer.class);
+		enabled = config.isAddTestUser();
 	}
 	
 	private Iterable<WorkerEntity> createAndSaveWorkersList(UserEntity user) {
@@ -127,24 +132,25 @@ public class DevelopmentDataLoader implements ApplicationRunner {
 
 	@Override
 	public void run(ApplicationArguments arg0) throws Exception {
-		try {
-			List<UserTO> users = new LinkedList<>();
-			for (int i = 0; i < 4; i++) {
-				UserTO user = createAndRegisterTestUser("username" + i, "username" + i + "@example.com");
-				users.add(user);
-				UserEntity userEntity = userRepository.findByEmail(user.getEmail());
-				List<ClientEntity> userClients = new LinkedList<>();
-				for (int j = 0; j < 4; j++) {
-					ClientEntity client = createAndSaveClientEntity(userEntity, "client" + i + j + "@example.com", "Client" + i + j, "Surname" + i + j);
-					AddressEntity address = createAndSaveAddressEntity("Street" + i + j, String.valueOf(i), String.valueOf(j));
-					List<WorkerEntity> workers = (List<WorkerEntity>) createAndSaveWorkersList(userEntity);
-					createAndSaveProjectEntity(address, client, userEntity, workers);
-				}
-			}			
-		} catch (RegistrationException e) {
-			logger.error("Failed to create test user");
+		if (enabled) {
+			try {
+				List<UserTO> users = new LinkedList<>();
+				for (int i = 0; i < 4; i++) {
+					UserTO user = createAndRegisterTestUser("username" + i, "username" + i + "@example.com");
+					users.add(user);
+					UserEntity userEntity = userRepository.findByEmail(user.getEmail());
+					List<ClientEntity> userClients = new LinkedList<>();
+					for (int j = 0; j < 4; j++) {
+						ClientEntity client = createAndSaveClientEntity(userEntity, "client" + i + j + "@example.com", "Client" + i + j, "Surname" + i + j);
+						AddressEntity address = createAndSaveAddressEntity("Street" + i + j, String.valueOf(i), String.valueOf(j));
+						List<WorkerEntity> workers = (List<WorkerEntity>) createAndSaveWorkersList(userEntity);
+						createAndSaveProjectEntity(address, client, userEntity, workers);
+					}
+				}			
+			} catch (RegistrationException e) {
+				logger.error("Failed to create test user");
+			}
 		}
-		
 	}
 
 }
