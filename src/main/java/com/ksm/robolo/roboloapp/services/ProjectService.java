@@ -23,4 +23,6 @@ public interface ProjectService {
 	void updateClient(Long projectId, Long clientId) throws ProjectServiceException;
 	
 	void deleteProject(Long projectId);
+	
+	void removeClientFromProjects(Long clientId, String username);
 }

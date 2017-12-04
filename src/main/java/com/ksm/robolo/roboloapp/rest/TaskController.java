@@ -109,6 +109,20 @@ public class TaskController {
     	return new ResponseEntity<List<List<TaskTO>>>(sortTasks(taskList), HttpStatus.OK);
 	}
 	
+	@PostMapping("/{projectId}/{taskId}/add-workers")
+	public  ResponseEntity<List<List<TaskTO>>> addWorkersToTask(@PathVariable Long projectId, @PathVariable Long taskId, @RequestBody List<Long> workerIdList) {
+		try {
+			taskService.updateWorkersList(taskId, workerIdList);
+		} catch (TaskServiceException e) {
+			e.printStackTrace();
+			return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+		}
+		
+		List<TaskTO> taskList = taskService.findByProjectId(projectId);
+		
+    	return new ResponseEntity<List<List<TaskTO>>>(sortTasks(taskList), HttpStatus.OK);
+	}
+	
 	@DeleteMapping("/delete/{projectId}/{taskId}")
 	public ResponseEntity<List<List<TaskTO>>> deleteTask(@PathVariable Long projectId, @PathVariable Long taskId) {
 		taskService.deleteTask(taskId);

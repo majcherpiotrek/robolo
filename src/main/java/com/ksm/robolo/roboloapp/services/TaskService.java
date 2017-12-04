@@ -16,6 +16,8 @@ public interface TaskService {
 	void setTaskInProgress(Long taskId) throws TaskServiceException;
 	
 	void setTaskToDo(Long taskId) throws TaskServiceException;
+	
+	void updateWorkersList(Long taskId, List<Long> workerIdList) throws TaskServiceException;
 
 	void deleteTask(Long taskId);
 }

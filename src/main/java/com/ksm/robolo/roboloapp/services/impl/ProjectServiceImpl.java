@@ -231,6 +231,17 @@ public class ProjectServiceImpl implements ProjectService {
 		}
 	}
 	
+	@Override
+	public void removeClientFromProjects(Long clientId, String username) {
+		UserEntity userEntity = userRepository.findByUsername(username);
+		List<ProjectEntity> projectEntityList = projectRepository.findAllByUserEntityIdAndClientId(userEntity.getId(), clientId);
+		
+		for (ProjectEntity project : projectEntityList) {
+			project.setClient(null);
+			projectRepository.saveAndFlush(project);
+		}
+	}
+	
 	private UserEntity getUser(String username) {
 		String errorMsg = "Unexpected error - no logged in user!";
 		Assert.notNull(username, errorMsg);

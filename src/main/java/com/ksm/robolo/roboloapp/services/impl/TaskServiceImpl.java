@@ -2,6 +2,7 @@ package com.ksm.robolo.roboloapp.services.impl;
 
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.LinkedList;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -9,10 +10,13 @@ import org.springframework.stereotype.Service;
 
 import com.ksm.robolo.roboloapp.domain.ProjectEntity;
 import com.ksm.robolo.roboloapp.domain.TaskEntity;
+import com.ksm.robolo.roboloapp.domain.WorkerEntity;
 import com.ksm.robolo.roboloapp.enums.TaskStatus;
 import com.ksm.robolo.roboloapp.repository.ProjectRepository;
 import com.ksm.robolo.roboloapp.repository.TaskRepository;
+import com.ksm.robolo.roboloapp.repository.WorkerRepository;
 import com.ksm.robolo.roboloapp.services.TaskService;
+import com.ksm.robolo.roboloapp.services.WorkerService;
 import com.ksm.robolo.roboloapp.services.exceptions.ExceptionUnwrapper;
 import com.ksm.robolo.roboloapp.services.exceptions.TaskServiceException;
 import com.ksm.robolo.roboloapp.services.util.impl.TaskToTOConverter;
@@ -25,13 +29,20 @@ public class TaskServiceImpl implements TaskService {
 	private ProjectRepository projectRepository;
 	private TaskToTOConverter taskToTOConverter;
 	private ExceptionUnwrapper exceptionUnwrapper;
+	private WorkerRepository workerRepository;
 	
 	@Autowired
-	public TaskServiceImpl(TaskRepository taskRepository, ProjectRepository projectRepository, TaskToTOConverter taskToTOConverter, ExceptionUnwrapper exceptionUnwrapper) {
+	public TaskServiceImpl(
+			TaskRepository taskRepository, 
+			ProjectRepository projectRepository, 
+			TaskToTOConverter taskToTOConverter, 
+			ExceptionUnwrapper exceptionUnwrapper,
+			WorkerRepository workerRepository) {
 		this.taskRepository = taskRepository;
 		this.projectRepository = projectRepository;
 		this.taskToTOConverter = taskToTOConverter;
 		this.exceptionUnwrapper = exceptionUnwrapper;
+		this.workerRepository = workerRepository;
 	}
 
 	@Override
@@ -106,5 +117,21 @@ public class TaskServiceImpl implements TaskService {
 	@Override
 	public void deleteTask(Long taskId) {
 		taskRepository.deleteById(taskId);
+	}
+
+	@Override
+	public void updateWorkersList(Long taskId, List<Long> workerIdList) throws TaskServiceException {
+		TaskEntity task = taskRepository.findById(taskId);
+		if (task == null) {
+			throw new TaskServiceException("Task not found!");
+		}
+		
+		List<WorkerEntity> workers = new LinkedList<>();
+		for (Long workerId : workerIdList) {
+			workers.add(workerRepository.findById(workerId));
+		}
+		
+		task.setWorkers(workers);
+		taskRepository.save(task);
 	}
 }
