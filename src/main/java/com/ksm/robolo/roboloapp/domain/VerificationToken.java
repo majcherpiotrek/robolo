@@ -1,11 +1,16 @@
 package com.ksm.robolo.roboloapp.domain;
 
-import com.ksm.robolo.roboloapp.tos.UserTO;
-
-import javax.persistence.*;
 import java.sql.Timestamp;
 import java.util.Calendar;
 import java.util.Date;
+
+import javax.persistence.Entity;
+import javax.persistence.FetchType;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.OneToOne;
 
 @Entity
 public class VerificationToken {
