@@ -32,7 +32,7 @@ public class EmailServiceImpl implements EmailService{
 		
 		Mail mail = new Mail(from, subject, to, mailContent);
 		
-		SendGrid sg = new SendGrid(System.getenv("PIWIND_API_KEY"));
+		SendGrid sg = new SendGrid(System.getenv("SENDGRID_API_KEY"));
 		Request request = new Request();
 		
 		try {
