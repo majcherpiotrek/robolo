@@ -28,7 +28,7 @@ public class DeleteUnverifiedUserAccountsScheduledTask {
         this.verificationTokenRepository = verificationTokenRepository;
     }
 
-    @Scheduled(fixedRate = 1000 * 10) // Every 10 minutes
+    @Scheduled(fixedRate = 1000 * 60) // Every minute
     @Transactional
     public void deleteUnverifiedUserAccounts() {
         logger.info("Searching for unverified users ...");
