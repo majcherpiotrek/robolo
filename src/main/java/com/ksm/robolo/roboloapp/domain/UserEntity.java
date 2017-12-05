@@ -14,6 +14,7 @@ public class UserEntity {
 	
 	@Id
 	@GeneratedValue(strategy = GenerationType.AUTO)
+	@Column(name = "user_id")
 	private UUID id;
 
 	@Column(unique = true)

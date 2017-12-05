@@ -1,15 +1,15 @@
 package com.ksm.robolo.roboloapp.repository;
 
-import com.ksm.robolo.roboloapp.domain.VerificationToken;
+import java.util.UUID;
+
+import javax.transaction.Transactional;
+
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.CrudRepository;
-
-import com.ksm.robolo.roboloapp.domain.UserEntity;
 import org.springframework.data.repository.query.Param;
 
-import javax.transaction.Transactional;
-import java.util.UUID;
+import com.ksm.robolo.roboloapp.domain.UserEntity;
 
 public interface UserRepository extends CrudRepository<UserEntity, UUID> {
 
