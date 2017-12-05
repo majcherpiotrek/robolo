@@ -1,9 +1,10 @@
 package com.ksm.robolo.roboloapp.events;
 
-import com.ksm.robolo.roboloapp.tos.UserTO;
+import java.util.Locale;
+
 import org.springframework.context.ApplicationEvent;
 
-import java.util.Locale;
+import com.ksm.robolo.roboloapp.tos.UserTO;
 
 public class OnRegistrationCompleteEvent extends ApplicationEvent {
     private String appUrl;

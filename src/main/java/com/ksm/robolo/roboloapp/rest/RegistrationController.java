@@ -25,7 +25,7 @@ public class RegistrationController {
 
     private final ApplicationEventPublisher applicationEventPublisher;
 
-    private static final String CONFIRMATION_URL= "http://localhost:8080/confirm/";
+    private static final String CONFIRMATION_URL= "http://robolify-server.herokuapp.com/confirm/";
 
     @Autowired
     public RegistrationController(UserService userService, ApplicationEventPublisher applicationEventPublisher) {
